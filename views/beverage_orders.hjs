@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include roboto.css to use the Roboto web font, material.css to include the theme and ripples.css to style the ripple effect -->
+    <link href="../css/roboto.min.css" rel="stylesheet">
+    <link href="../css/material.min.css" rel="stylesheet">
+    <link href="../css/ripples.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <title>Beverage Orders for Restaurant Id {{fv_id}}</title>
+    <style type="text/css">
+      #orders {
+        margin: 20px;
+      }
+      #home_link {
+        margin-left: 20px;
+        color: #03a9f4;
+        font-size: 15px;
+      }
+      #orders table tbody td {
+        text-transform: capitalize;
+        vertical-align: middle;
+      }
+      .done_btn {
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="orders" class="panel">
+      <div class="panel_header">
+      <img class="icon" src="../img/icons/Orders.png">
+      <h4>Beverage Orders for Restaurant: <span id="fv_name"></span></h4>
+      </div>
+      <table class="table table-striped table-hover ">
+        <thead>
+          <tr>
+            <th>Bill No.</th>
+            <th>Time</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <script src="../js/jquery.js"></script>
+    <script src="../js/underscore.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/ripples.min.js"></script>
+    <script src="../js/material.min.js"></script>
+    <script src="../js/socket.io.js"></script>
+    <script src="../js/simpleStorage.js"></script>
+    <script>
+      // global variables
+      HQ_URL = '{{ hq_url }}';
+      OUTLET_ID = '{{ outlet_id }}';
+      OUTLET_URL = '{{ outlet_host }}{{ outlet_port }}';
+      WEBSOCKET_URL = '{{ outlet_host }}{{ websocket_port }}';
+      var fv_id = {{fv_id}};
+      // store data on simpleStorage
+      var key = 'beverage_orders_'+fv_id;
+    </script>
+    <script>
+      $(document).ready(function() {
+        // Initializing material design
+        $.material.init();
+
+        // Done button callback
+        $("#orders").on("click", ".done_btn", function() {
+          var id = $(this).attr("id");
+          var keys = id.split('_');
+          var bill_no = keys[0];
+          var item_id = keys[1];
+
+          // Remove keys from simpleStorage
+          var orders = simpleStorage.get(key);
+          var updated_orders = _.reject(orders, function(o){
+            return ((o.bill_no == bill_no) &&
+              (o.item_id == item_id));
+          });
+          var result_code = simpleStorage.set(key, updated_orders);
+          console.log("Result code is ", result_code);
+          loadOrders();
+        });
+
+        // First time read.
+        loadOrders();
+      });
+
+      // sync from live orders
+      var socket = io.connect(WEBSOCKET_URL);
+
+      socket.on('test_mode', function(flag) {
+        simpleStorage.set("test_mode", flag);
+        loadOrders();
+      });
+
+      socket.on('beverage_orders', function(data){
+        console.log(data);
+        var bev_orders = [];
+        var bill_no = data.bill_no;
+        // Ignore test_mode bills
+        if(Number(bill_no) == 0) {
+          return;
+        }
+        var sides = data.sides;
+        var d = new Date();
+        for(var item_id in sides) {
+          var item = sides[item_id];
+          if(item.restaurant_details.id != fv_id){
+            continue;
+          }
+          bev_orders.push({
+            bill_no:bill_no,
+            item_id: item_id,
+            item_name: item.name,
+            count: item.count,
+            restaurant: item.restaurant_details.name,
+            time: d.toDateString() + ' ' + d.toLocaleTimeString()
+          });
+        }
+
+        var existing = simpleStorage.get(key);
+        if(! existing) {
+          console.log("Key does not exist");
+          existing = [];
+        }
+        var val = existing.concat(bev_orders);
+        var result_code = simpleStorage.set(key, val);
+        console.log("Result code is ", result_code);
+        loadOrders();
+      });
+
+      function loadOrders() {
+        // Clearing off
+        $('#orders .table tbody').empty();
+        var test_mode = simpleStorage.get('test_mode');
+        if(test_mode) {
+          return;
+        }
+        var orders = simpleStorage.get(key);
+        var tbody = $('#orders .table tbody');
+        if(orders && (! _.isEmpty(orders))) {
+          var first = _.first(orders);
+          $('#fv_name').text(first.restaurant);
+          _.each(orders, function(o){
+            var trow = $('<tr/>');
+            $(tbody).append(trow);
+            var row_key = o.bill_no + "_" + o.item_id;
+            var done_button = '<button id="' + row_key + '" class="btn btn-primary done_btn">DONE</button>';
+            trow.append($("<td>" + o.bill_no + "</td>"));
+            trow.append($("<td>" + o.time + "</td>"));
+            trow.append($("<td>" + o.item_name + "</td>"));
+            trow.append($("<td>" + o.count + "</td>"));
+            trow.append($("<td>" + done_button + "</td>"));
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

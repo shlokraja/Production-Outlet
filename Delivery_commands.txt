@@ -1,0 +1,23 @@
+
+sudo mkdir /home/ubuntu/shlok/fromprod/06052017
+sudo mkdir /home/ubuntu/shlok/fromprod/06052017/api
+sudo mkdir /home/ubuntu/shlok/fromprod/06052017/public
+sudo mkdir /home/ubuntu/shlok/fromprod/06052017/public/js
+sudo mkdir /home/ubuntu/shlok/fromprod/06052017/routes
+sudo cp /opt/foodbox_outlet/api/mobileapp.js /home/ubuntu/shlok/fromprod/06052017/api/mobileapp.js
+sudo cp /opt/foodbox_outlet/public/js/mobileapp.js /home/ubuntu/shlok/fromprod/06052017/public/js/mobileapp.js
+sudo cp /opt/foodbox_outlet/public/js/utils.js /home/ubuntu/shlok/fromprod/06052017/public/js/utils.js
+sudo cp /opt/foodbox_outlet/routes/outlet_app.js /home/ubuntu/shlok/fromprod/06052017/routes/outlet_app.js
+sudo cp -R /home/ubuntu/shlok/fromshlok/06052017/* /opt/foodbox_outlet
+
+
+sudo nano /opt/foodbox_outlet/api/mobileapp.js
+
+sudo nano /opt/foodbox_outlet/public/js/mobileapp.js
+
+sudo restart foodbox_outlet
+sudo restart foodbox_plc
+sudo restart foodbox_menu_display
+
+
+sudo nano /opt/foodbox_outlet/misc/printermobile.js

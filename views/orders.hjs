@@ -1,0 +1,272 @@
+<html>
+<head>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include roboto.css to use the Roboto web font, material.css to include the theme and ripples.css to style the ripple effect -->
+    <link href="css/roboto.min.css" rel="stylesheet">
+    <link href="css/material.min.css" rel="stylesheet">
+    <link href="css/ripples.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/offline-language-english.css" rel="stylesheet" />
+    <link href="css/offline-theme-slide.css" rel="stylesheet" />
+    <title>Orders</title>
+    <style type="text/css">
+        #orders {
+            margin: 20px;
+        }
+
+        #home_link {
+            margin-left: 20px;
+            color: #03a9f4;
+            font-size: 15px;
+        }
+
+        #refund_buttons {
+            margin-left: 700px;
+        }
+
+        #orders .prev_day {
+            margin-left: 740px;
+        }
+
+        #temp_row .total_text {
+            margin-left: 1004px;
+        }
+
+        #temp_row #replace {
+            margin-right: 10px;
+        }
+
+        #orders .prev_day, #orders .next_day {
+            color: #03a9f4;
+            padding: 5px;
+        }
+
+        #date_selector {
+            border: none;
+            color: #03a9f4;
+            text-align: center;
+            font-size: 15px;
+            vertical-align: sub;
+            margin-left: 30px;
+        }
+
+        #replace-dialog .modal-header .modal-title {
+            margin-right: 270px;
+        }
+
+        #replace-dialog .modal-body #replace-tab-headers {
+            background: #CCCCCC;
+            display: inline-block;
+        }
+
+        #orders table tbody td {
+            text-transform: capitalize;
+        }
+
+        #orders table #refund_buttons img {
+            width: 30px;
+        }
+
+        #orders table tbody td .rupee-img {
+            margin-bottom: 2px;
+            width: initial;
+        }
+
+        #orders table img {
+            margin-right: 5px;
+        }
+
+        #temp_table thead .checkbox label {
+            font-weight: bold;
+        }
+
+        #temp_table .checkbox_header {
+            margin-left: 3px;
+        }
+
+        #temp_table thead {
+            background-color: #DEDEDE;
+        }
+
+            #temp_table thead .bill_no {
+                width: 200px;
+            }
+
+        .error_msg {
+            margin-left: 10px;
+        }
+
+        #confirm-refund-dialog .modal-header {
+            border-bottom: 1px solid #CCCCCC;
+        }
+
+        #confirm-refund-dialog .modal-body {
+            margin-top: 20px;
+        }
+
+        #report-issues-dialog .modal-body .food_btn {
+            background-color: #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+    <a id="home_link" class="threads" href="/">&lt; Home</a>
+    <div id="orders" class="panel">
+        <div class="panel_header">
+            <img class="icon" src="img/icons/Orders.png">
+            <h4>Orders</h4>
+            <button class="prev_day btn btn-raised btn-default">&lt;</button>
+            <span class="filter_text"></span>
+            <input id="date_selector" type="date" />
+            <button class="next_day btn btn-raised btn-default">&gt;</button>
+        </div>
+        <table class="table table-striped table-hover ">
+            <thead>
+                <tr>
+                    <th>Order No.</th>
+                    <th>Bill Nos.</th>
+                    <th>Status</th>
+                    <th>Payment Mode</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                </tr> 
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="confirm-refund-dialog" data-backdrop="static" data-keyboard="false" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Refund.png" height="30">
+                    <h4 class="modal-title">Refund</h4>
+                </div>
+                <div class="modal-body">
+                    Refund amount <img class="icon rupee-img" src="img/icons/Rupee.png"><span class="refund_amount"></span> to the customer
+                </div>
+                <div class="modal-footer">
+                    <button id="refund_ok" class="btn btn-raised btn-default">Confirm</button>
+                    <button id="refund_cancel" class="btn btn-raised btn-default">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="replace-dialog" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Replace.png" height="30">
+                    <h4 class="modal-title">Replace</h4>
+                    <span class="cash_diff_text">Please collect </span><img class="icon rupee-img" src="img/icons/Rupee.png"><span class="cash_difference_amount"></span>
+                </div>
+                <div class="modal-body">
+                    <ul id="replace-tab-headers" class="nav nav-tabs"></ul>
+                    <div id="replace-tab-content" class="tab-content">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="replace_confirm" class="btn btn-raised btn-default">Confirm</button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-issues-dialog" data-backdrop="static" data-keyboard="false" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Report Issues.png" height="30">
+                    <h4 class="modal-title">Report Issue</h4>
+                </div>
+                <div class="modal-body">
+                    <button class="food_btn
+              btn btn-flat btn-default">
+                        Food
+                    </button>
+                    <div class="" id="food_issue">
+                        <div class="item_id_list">
+                            <table class="table table-hover ">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Barcode</th>
+                                        <th>Qty.</th>
+                                        <th>Reason</th>
+                                        <th>Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="submit_report_issue
+            btn btn-raised btn-default">
+                        Ok
+                    </button>
+                    <!--  <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ripples.min.js"></script>
+    <script src="js/material.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <script src="js/simpleStorage.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/offline.min.js"></script>
+
+    <script>
+        // global variables
+        HQ_URL = '{{ hq_url }}';
+        OUTLET_ID = '{{ outlet_id }}';
+        OUTLET_URL = '{{ outlet_host }}{{ outlet_port }}';
+        WEBSOCKET_URL = '{{ outlet_host }}{{ websocket_port }}';
+        stock_count = {};
+        price_data = {};
+        unlock = true;
+        socket = io.connect(WEBSOCKET_URL);
+
+        /*setInterval(function() {
+          location.reload(true);
+        }, 60000);*/
+    </script>
+    <script src="js/orders.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        $(document).ready(function ()
+        {
+            // Initializing material design
+            $.material.init();
+
+            // Set the date to current day and populate issues.
+            var d = new Date();
+            $("#orders #date_selector").val(d.yyyymmdd());
+            $("#orders #date_selector").trigger("change");
+
+            // Getting the item details
+            getItemDetails();
+            getIssueEnum();
+
+            var outlet_url = process.env.OUTLET_HOST;
+            console.log("outlet_url :-", outlet_url);
+            var run = function ()
+            {
+                var req = new XMLHttpRequest();
+                req.timeout = 5000;
+                req.open('GET', outlet_url, true);
+                req.send();
+            }
+
+            setInterval(run, 3000);
+        });
+    </script>
+</body>
+</html>

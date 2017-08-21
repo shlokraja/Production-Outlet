@@ -1,0 +1,179 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('outlet_app:server');
+var http = require('http');
+var cronJob = require('cron').CronJob;
+
+// Doing the force tcp keepalive
+require('node-ka-patch');
+
+var redis = require('redis');
+var redisClient = redis.createClient();
+redisClient.on('error', function(msg) {
+  console.error(msg);
+});
+var helper = require('../routes/helper');
+
+var update_stock_count_expiry = require('../misc/updateStockCountExpiry');
+var store_plc_config = require('../misc/storePLCConfig');
+var store_live_stock = require('../misc/storeLiveStock');
+var store_outlet_config = require('../misc/storeOutletConfig');
+var check_incoming_po = require('../misc/checkIncomingPOStatus');
+var populate_loading_issue_items = require('../misc/populateLoadingIssueItems');
+var store_recovery_details = require('../misc/storeRecoveryDetails');
+var store_dispenser_queue = require('../misc/storeDispenserQueue');
+var store_item_ids = require('../misc/storeItemIds');
+
+// global variable to store list of item ids
+OUTLET_ITEM_IDS = [];
+
+RUN_COUNT = (new Date()).getTime();
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+server.timeout = 0;
+io = require('socket.io')(server);
+
+// This call returns the stock count to the order app
+io.on('connection', function (socket) {
+  console.log("Socket connection made by a client");
+  // Getting the stock count from redis
+  redisClient.get(helper.stock_count_node, function(err, reply) {
+    if (err) {
+      console.error(err);
+      socket.emit('stock_count', {"error": "error while retreiving from redis- {}".format(err)});
+      return;
+    }
+    var parsed_response = JSON.parse(reply);
+    var item_id_list = [];
+    for (var item_id in parsed_response) {
+      item_id_list.push(item_id+'_locked_count');
+    }
+    // Getting the lock count from another data structure
+    redisClient.mget(item_id_list, function(l_err, l_reply) {
+      for (var item_id in parsed_response) {
+        if (l_reply[item_id_list.indexOf(item_id+'_locked_count')]) {
+          parsed_response[item_id]["locked_count"] = parseInt(l_reply[item_id_list.indexOf(item_id+'_locked_count')]);
+        } else {
+          parsed_response[item_id]["locked_count"] = 0;
+        }
+      }
+      console.log("Emitting the stock count- " + parsed_response);
+      socket.emit(helper.stock_count_node, parsed_response);
+    });
+  });
+});
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+server.on('close', function() {
+  debug("Server is closing this connection");
+})
+
+server.on('clientError', function (exception, socket) {
+  debug("An error from client happened- ", exception);
+})
+
+// Starting the cron job to send live stock data every hour
+var job = new cronJob('0 * * * *', function(){
+    store_live_stock();
+  },
+  true, /* Start the job right now */
+  'Asia/Kolkata' /* Time zone of this job. */
+);
+
+store_recovery_details();
+store_dispenser_queue();
+store_plc_config();
+store_outlet_config();
+populate_loading_issue_items();
+store_item_ids();
+
+// The update of stock_count on expiry of items
+setInterval(update_stock_count_expiry, 2000);
+setInterval(check_incoming_po, 10000);
+setInterval(populate_loading_issue_items, 10000);
+// Keeping the config refresh interval to be every hour
+setInterval(store_plc_config, 3600000);
+setInterval(store_outlet_config, 3600000);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

@@ -1,0 +1,143 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=400, initial-scale=1.0" />
+    <title>Bill</title>
+    <style type="text/css">
+    body {
+      width: 400px;
+      font-family: Calibri;
+    }
+    /*General purpose styling classes */
+    .center {
+      text-align: center;
+    }
+    .inline {
+      display: inline-block;
+    }
+    .side_order {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    /*Div specific styling classes */
+    #rest_name {
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    #rest_address {
+      font-size: 9px;
+    }
+    #date_time {
+      overflow: auto;
+      font-weight: bold;
+    }
+    #date {
+      float:left;
+      font-size: 12px;
+    }
+    #time {
+      float: right;
+      font-size: 12px;
+    }
+    #order_no {
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid;
+      width: 200px;
+      margin: 0 auto;
+      margin-bottom: 10px;
+    }
+    #items {
+      text-align: center;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #items thead {
+      border-top: 1px solid;
+      border-bottom: 1px solid;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    #items tbody, #tin_no, #st_no {
+      font-size: 11px;
+    }
+    #items #spacer td {
+      padding-top: 50px;
+    }
+    #items #amount_row {
+      border-top: 1px solid;
+      border-bottom: 1px solid;
+    }
+    #items #amount_row #amount_text {
+      text-align: left;
+    }
+    #footer {
+      border: 1px dotted;
+      font-size: 11px;
+    }
+    #contact_us {
+      margin-top: 10px;
+      overflow: auto;
+    }
+    #talk_text {
+      float: left;
+      margin-right: 70px;
+    }
+    #icons {
+      float: left;
+    }
+    #icons img {
+      height: 20px;
+      width: 20px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    #thank_you {
+      margin-top: 10px;
+      font-weight: bold
+      font-size: 11px;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="rest_name" class="center">Frshly</div>
+    <div id="date_time"><div id="date" class="inline">Date - 09/06/2015</div><div id="time" class="inline">Time - 12:59:00</div></div>
+    <div id="order_no" class="center">ORDER NO: 39</div>
+    <table id="items">
+      <thead>
+        <td>S. No</td>
+        <td>Items</td>
+        <td>Qty</td>
+        <td>Amount</td>
+      </thead>
+      <tbody>
+        <tr id="spacer">
+          <td></td><td></td><td></td>
+        </tr>
+        <tr id="amount_row">
+          <td colspan="2" id="amount_text">Total Amount (incl. applicable taxes)</td>
+          <td>INR</td>
+          <td id="amount_num">125</td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="tin_no">TIN No- </div>
+    <div id="st_no">ST No- </div>
+    <div id="savings">You have saved INR </div>
+    <div id="footer">
+      <div class="center">A service facilitated by Frshly.</div>
+      <div id="contact_us">
+        <div id="talk_text">Talk to us:</div>
+        <div id="icons">
+          <div id="mail"><img src="img/email.png" />feedback@gofrshly.com</div>
+          <div id="fb"><img src="img/fb.png" />gofrshly</div>
+          <div id="twitter"><img src="img/twitter.png" />gofrshly</div>
+        </div>
+      </div>
+    </div>
+    <div id="thank_you" class="center">Thank you! enjoy your meal!</div>
+  </body>
+</html>

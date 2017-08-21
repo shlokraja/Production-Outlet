@@ -1,0 +1,748 @@
+<html>
+<head>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include roboto.css to use the Roboto web font, material.css to include the theme and ripples.css to style the ripple effect -->
+    <link href="css/roboto.min.css" rel="stylesheet">
+    <link href="css/material.min.css" rel="stylesheet">
+    <link href="css/material-fullpalette.min.css" rel="stylesheet">
+    <link href="css/ripples.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/offline-language-english.css" rel="stylesheet" />
+    <link href="css/offline-theme-slide.css" rel="stylesheet" />
+    <title>{{short_name}} - Dashboard</title>
+    <style type="text/css">
+        #temp_table {
+            margin-bottom: 0px;
+        }
+
+            #temp_table thead .checkbox label {
+                font-weight: bold;
+            }
+
+        .total_money {
+            margin-left: 300px;
+        }
+
+   .signal {
+    border: 5px solid #333;
+    border-radius: 30px;
+    height: 30px;
+    left: 50%;
+    margin: -15px 0 0 -15px;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    width: 30px;
+ z-index:10000;
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+}
+
+.unscanned-msg, .unscanned-msg-title{    
+    font-size: 14px;
+}
+
+.unscanned-msg-title{
+    color: red; 
+}
+   
+@keyframes pulsate {
+    0% {
+      transform: scale(.1);
+      opacity: 0.0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+}
+    </style>
+    <!--<script src="js/mobileapp.js"></script>
+    <script src="js/mobileorderutils.js"></script>-->
+</head>
+<body>
+    <!--<div id="idtest"> test content</div>-->
+    <div id="main_content">
+
+        <div class="signal"></div>
+
+        <div id="left_pane">
+            <div id="purchase_orders" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Purchase Order.png" />
+                    <h4>Purchase Orders</h4>
+					<h4><div class="live"><div class="status"></div><div class="live_text"></div></div></h4>
+                </div>
+                <div class="live"><div class="num"></div><div class="live_text">Today</div></div>
+                <a href="javascript:void(0)" class="incoming_pos btn btn-primary btn-material-light-blue">
+                    <img src="img/icons/Incoming PO.png" height="30">
+                    <div class="text">
+                        <div class="num"></div>
+                        <div class="incoming_text">Incoming</div>
+                    </div>
+                </a>
+				
+            </div>
+
+            <div id="collect_cash_body">
+                <div id="collect_cash" class="panel">
+                    <div class="panel_header">
+                        <img class="icons" src="img/icons/Rupee.png">
+                        <h4>Collect Cash</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cash_change">
+                <table class="table table-striped table-hover ">
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr><td class="change_1000"></td></tr>
+                        <tr><td class="change_500"></td></tr>
+                        <tr><td class="change_100"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="orders" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Orders.png">
+                    <h4>Orders</h4>
+                    <a href="/orders"><img class="new_link" src="img/icons/open_link.png" /></a>
+                    <a href="/dispenser_queue" class="dispenser_queue btn btn-default btn-raised">Dispenser Queue</a>
+                    <a href="javascript:void(0)" class="stop_order btn btn-default btn-raised"><img src="img/icons/Stop.png"><span>Stop</span></a>
+                </div>
+            </div>
+
+            <div id="issues" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Issues.png">
+                    <h4>Issues</h4>
+                    <a href="/issues"><img class="new_link" src="img/icons/open_link.png" /></a>
+                    <a href="javascript:void(0)" class="report_issues btn btn-default btn-raised"><img src="img/icons/Report Issues.png" height="30"><span>Report</span></a>
+                </div>
+                <div class="issue_list"></div>
+            </div>
+
+            <div id="message_center" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Messages.png">
+                    <h4>Messages</h4>
+                    <div class="num_threads"><div class="num">0</div>unread</div>
+                    <a href="javascript:void(0)" class="compose_message btn btn-default btn-raised"><img src="img/icons/Compose.png"><span>Compose</span></a>
+                </div>
+            </div>
+        </div>
+        <div id="right_pane">
+             <div id="mobile_pending_orders" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Messages.png">
+                    <h4>Mobile Pending Orders</h4>
+                </div>
+                <div id="mobile_pending_orders_body">
+                </div>
+            </div>
+
+            <div id="notifications" class="panel">
+                <div class="panel_header">
+                    <img class="icon" src="img/icons/Notifications.png">
+                    <h4>Notifications</h4>
+                </div>
+                <div id="notifications_body">
+                </div>
+            </div>
+           
+            <div id="sales_cash" class="panel">
+                <div class="panel_header">
+                    <img class="icons" src="img/icons/Rupee.png">
+                    <h4>Sales & Cash</h4>
+                    <span class="cash_label">Cash</span>
+                    <span class="cash_value"><img src="img/icons/Rupee.png" /> 0</span>
+                    <a href="javascript:void(0)" class="spends btn btn-default btn-raised"><img src="img/icons/Report Issues.png" height="30"><span>Spends</span></a>
+                </div>
+                <div id="sales_cash_table"></div>
+
+                <!--<div class="nos">
+                  <div class="food"><div class="num">0</div>Food</div>
+                  <div class="others"><div class="num">0</div>Others</div>
+                </div>
+                <div class="month">
+                  <div class="month_text"></div>
+                  <div class="food"><div class="num">0</div>Food</div>
+                  <div class="others"><div class="num">0</div>Others</div>
+                </div>
+                <div class="day">
+                  <div class="text">Today</div>
+                  <div class="food"><div class="num">0</div>Food</div>
+                  <div class="others"><div class="num">0</div>Others</div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <div id="footer">
+        <img class="logo" src="img/icons/logo.png" height="30">
+        <button id="staff_roster" class="btn btn-default btn-raised"><span>Staff Roster</span></button>
+        <button id="beverage_control" class="btn btn-default btn-raised"><span>Beverage Control</span></button>
+        <button id="do_eod" class="btn btn-danger btn-raised"><span>Generate EOD</span></button>
+        <button id="force_failure" class="btn btn-danger btn-raised"><span>Manual Failure</span></button>
+        <button id="load_scanned_items" class="btn btn-material-blue-200"  style="height:36px;margin-top: 15px;">
+            <!--<img src="img/icons/Load.png" height="30">-->
+            <span style="margin-left:-10px;">Load Scan Items</span>
+        </button>
+        <button id="load_items" class="btn btn-material-blue-200" style="height:36px;margin-top: 15px;"><span>Expiry Popup</span></button>
+	<button id="retest" class="btn btn-danger btn-raised" style="margin-top:15px;margin-left:5px;"><span>Retest</span></button>
+    </div>
+
+    <!--All the dialogs start from here. -->
+    <div id="expiry-items-dialog" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Load_black.png" height="30">
+                    <h4 class="modal-title">Expiry Popup</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="title">Remove expired items</div>
+                    <div class="expiry_image">
+                        <img src="img/icons/Remove Expired Items.png" height="200">
+                    </div>
+                    <div class="expiry_details">
+                        <div class="total_items"><div class="text">Total Items</div><div class="item_count"></div></div>
+                        <div class="slots"><div class="text">Slots</div><div class="slot_ids"></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="expiry_items_confirm" class="btn btn-flat btn-default">Done</button>
+                    <button class="btn btn-flat btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scanned-items-dialog" class="modal fade" tabindex="-1">
+        <div class="modal-dialog" style="width:1100px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--<img src="img/icons/Load_black.png" height="30">-->
+                    <div style="width:100%">
+                        <div style="float:left; margin-top: -10px;margin-right: 15px;" >
+                            <h4 class="modal-title">Scanned/Unscanned Items</h4>
+                        </div>
+                        <div>
+                            <div class="slot_legends_scanned slot_bg_scanned">
+                                <div class="slot_legends_scanned_text"> Scanned  </div>
+                            </div>
+
+                            <div class="slot_legends_scanned slot_bg_un_scanned">
+                                <div class="slot_legends_scanned_text"> Un-Scanned</div>
+                            </div>
+
+                            <div class="slot_legends_scanned slot_bg_empty">
+                                <div class="slot_legends_scanned_text"> Not included in current scan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <!--<div class="title">Scanned/Unscanned items</div>-->
+                    <br />
+                    <div class="scanned_slots">
+                        <!--<div class="total_items"><div class="text">Total Items</div><div class="item_count"></div></div>
+                        <div class="slots"><div class="text">Slots</div><div class="slot_ids"></div></div>-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!--<button id="expiry_items_confirm" class="btn btn-flat btn-default">Done</button>-->
+                    <button class="btn btn-flat btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="eod-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/End of Day.png" height="30">
+                    <h4 class="modal-title">End of Day - Store Supplies</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover ">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button id="eod_confirm" class="btn btn-raised btn-default">Confirm</button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sod-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Quality.png" height="30">
+                    <h4 class="modal-title">Start of Day - Store Supplies</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover ">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button id="sod_confirm" class="btn btn-raised btn-default">Confirm</button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="test_mode-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Test Mode</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="test_stage">Test is at stage - 0</div>
+                    <button id="start_stage_1" class="btn btn-raised btn-primary">Start test stage 1</button>
+                    <button id="start_stage_2" class="btn btn-raised btn-primary">Start test stage 2</button>
+                    <div class="report_issue">
+                        Report an issue
+                        <textarea class="form-control" rows="10"></textarea>
+                        <button class="btn btn-raised btn-default">Submit</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="test_complete" class="btn btn-raised btn-default">Test Complete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-threads-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Messages.png" height="30">
+                    <h4 class="modal-title">Messages</h4>
+                    <a href="javascript:void(0)" class="compose_message btn btn-default btn-raised"><img src="img/icons/Compose.png" height="30"><span>Compose</span></a>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-comments-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Messages.png" height="30">
+                    <h4 class="modal-title">Messages</h4>
+                    <a class="back_to_threads" href="javascript:void(0)">Back</a>
+                    <a href="javascript:void(0)" class="compose_message btn btn-default btn-raised"><img src="img/icons/Compose.png" height="30"><span>Compose</span></a>
+                </div>
+                <div class="modal-body">
+                    <div class="thread_title"></div>
+                    <div class="comments"></div>
+                    <div class="reply"><input class="reply_text form-control floating-label" id="focusedInput" type="text" placeholder="Type your message"><a href="javascript:void(0)" class="reply_button btn btn-default btn-raised"><img src="img/icons/Edit.png" height="30"><span>Reply</span></a></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="compose-message-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Messages.png" height="30">
+                    <h4 class="modal-title">New Message</h4>
+                </div>
+                <div class="modal-body">
+                    To:
+                    <div class="send_to"></div>
+                    <input class="subject form-control floating-label" type="text" placeholder="Subject" />
+                    <div class="message_body form-group">
+                        <div class="col-lg-10">
+                            <textarea class="form-control" rows="10" placeholder="Type your message"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="javascript:void(0)" class="reply_button btn btn-default btn-raised"><img src="img/icons/Edit.png" height="30"><span>Send</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="unscanned-items-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Load_black.png" height="30">
+                    <h4 class="modal-title">Load</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="title">Unload unscanned items</div>
+                    <div class="expiry_image">
+                        <img src="img/icons/Unload Unscanned Items.png" height="200">
+                    </div>
+                    <div class="expiry_details">
+                        <div class="slots"><div class="text">Slots</div><div class="slot_ids"></div></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="unscanned_items_confirm" class="btn btn-raised btn-default">Done</button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-issue-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Load_black.png" height="30">
+                    <h4 class="modal-title">Load</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="title">Report Issue with items</div>
+                    <div class="loading_issue_item_id_list">
+                        <div class="sub_title">For the current batch</div>
+                        <table class="table table-hover ">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty.</th>
+                                    <th>Reason</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="loading_add_btn"><img src="img/icons/Add Item.png" height="20">Add Item</div>
+                    <br />
+                    <div class="unscanned_item_id_list">
+                        <div class="sub_title">For the previously loaded batch</div>
+                        <table class="table table-hover ">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty.</th>
+                                    <th>Reason</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="unscanned_add_btn"><img src="img/icons/Add Item.png" height="20">Add Item</div>
+                </div>
+                <div class="modal-footer">
+                    <button id="loading_issue_confirm" class="btn btn-flat btn-default">Confirm</button>
+                    <button class="btn btn-flat btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incoming PO -->
+    <div id="incoming-po-dialog" class="modal fade">
+        <div class="modal-dialog" style="width:750px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Incoming PO.png" height="30">
+                    <h4 class="modal-title">Select Delivered PO</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <!--<th>&nbsp;</th>-->
+                                <th>PO No.</th>
+                                <th>Scheduled Time</th>
+                                <th>Items</th>
+                                <th>Qty.</th>
+                                <th>Restaurant</th>
+                                <th>Reconcile</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <!--<button class="incoming_po_select
+          btn btn-raised btn-default">
+                        Confirm
+                    </button>-->
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<input type="type" name="name" value=" " width="50px" maxlength="3" onkeyup="CheckPOQuantity(this);" />-->
+    <!-- Incoming PO Reconcile -->
+    <div id="incoming-po-reconcile-modal" class="modal fade">
+        <div class="modal-dialog" style="width:1250px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--<img src="img/icons/Incoming PO.png" height="30">-->
+                    <h4 class="modal-title">Reconcile PO</h4>
+                    <div class="unscanned-msg-title">The following item(s) are not scanned. so, please scan the item.</div>
+                    <div class="unscanned-msg"></div>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>                                
+                                <!--<th>Item Id</th>-->
+                                <th>Item Tag</th>
+                                <th>Item Master Id</th>
+                                <th>Item Name</th>
+                                <th>PO Qty</th>
+                                <th>Scan Qty</th>
+                                <th>Scan Fault Qty</th>
+                                <th>Damaged Qty</th>                                
+                                <!--<th>Damg./Miss Scan Qty</th>-->                                
+                                <th>Expiry Qty</th>                                
+                                <th>UnDelivered Qty</th>
+                                <th>Rest.Fault Qty</th>
+                                <!--<th>Rest.Scan Qty</th>-->
+                                <th>Remarks</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                                <!--<div id="non_food_issue">
+                                    Select Category
+                                    <select class="category form-control"></select>                                    
+                                </div>-->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="incoming_po_reconcile
+          btn btn-raised btn-default">
+                        Confirm
+                    </button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-issues-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="img/icons/Report Issues.png" height="30">
+                    <h4 class="modal-title">Report Issue</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="non_food_issue">
+                        Select Category
+                        <select class="category form-control"></select>
+                        Select Reporter
+                        <select class="reporter form-control"></select>
+                        <span>Note</span><textarea class="form-control" rows="10"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="submit_report_issue
+          btn btn-raised btn-default">
+                        Confirm
+                    </button>
+                    <button class="btn btn-raised btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="petty_cash-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Enter petty cash details</h4>
+                </div>
+                <div class="modal-body">
+                    Expenditure of the current month so far -<img class="modal_header_rupee" src="img/icons/Rupee.png"><span class="total_expenditure">0</span>
+                    <div class="petty-table">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Note</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="enter_petty_cash">
+                        <input class="amount form-control floating-label" type="text" placeholder="Amount" />
+                        Note
+                        <textarea class="note form-control" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="submit_petty_cash btn btn-default btn-raised">Submit</button>
+                    <button class="btn btn-default btn-raised" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="staff-roster-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Staff Roster</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button class="save_roster btn btn-default btn-raised">Confirm</button>
+                    <button class="btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="beverage-control-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Beverage Control</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button class="update_beverages btn btn-default btn-raised">Save</button>
+                    <button class="btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="force-failure-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Mark entire stock as Machine Failure</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="checkbox">
+                        <label>
+                            <input class="fail-all" type="checkbox"> Also mark unloaded purchase orders
+                            as Machine Failure.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="mark_failed btn btn-default btn-raised">Confirm</button>
+                    <button class="btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ripples.min.js"></script>
+    <script src="js/material.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <script src="js/simpleStorage.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/offline.min.js"></script>
+    <!--<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.0.1/async.min.js"></script> -->       
+    <script src="js/firebase.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/async.min.js"></script>        
+
+    <script>
+        // global variables
+        HQ_URL = '{{ hq_url }}';
+        OUTLET_ID = '{{ outlet_id }}';
+        OUTLET_URL = '{{ outlet_host }}{{ outlet_port }}';
+        WEBSOCKET_URL = '{{ outlet_host }}{{ websocket_port }}';
+        EXPIRY_TIME_INTERVAL='{{expiry_time_interval}}';
+        CHAT_URL = "https://atp-chat.firebaseio.com";
+        socket = io.connect(WEBSOCKET_URL);
+        automatic_eod_time='{{automatic_eod_time}}';
+        outlet_name='{{outlet_name}}';
+        city='{{city}}'; 
+        store_managers_mail_id='{{store_managers_mail_id}}';
+        price_data = {};
+        stock_count = {};
+        beverage_data = {};
+        start_of_day = {{start_of_day}};
+        // converting the string eod time into minutes elapsed
+        eod_time = '{{eod_time}}';
+        eod_time = parseInt(eod_time.split(':')[0])*60 + parseInt(eod_time.split(':')[1]);
+        is24hr = {{is24hr}};
+        supply_list = [];
+        staff_roster = {};
+        roles = '{{roles}}';
+        roles = (roles.substr(1,roles.length-2)).split(',');
+        from_load_items = false;
+        // This is for the three dialogs and they come during load and eod
+        // so this flag is to differentiate between them.
+        from_eod = false;
+    </script>
+    <script src="js/index.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/databindings.js"></script>
+    <script src="js/message_center.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.signal').hide()
+            // Initializing material design
+            $.material.init();
+            // Initializing the data bindings
+            initDataBindings();
+            getIssueEnum();
+           
+            if (simpleStorage.get("test_mode") == true) {
+                $("#test_mode-dialog").modal({show:true, backdrop:"static"});
+            }
+
+            var outlet_url=process.env.OUTLET_HOST;
+            var run = function(){
+                var req = new XMLHttpRequest();
+                req.timeout = 5000;
+                req.open('GET', outlet_url, true);
+                req.send();
+            }
+            setInterval(run, 3000);
+        });
+    </script>
+</body>
+</html>

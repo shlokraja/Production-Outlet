@@ -1,0 +1,231 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=400, initial-scale=1.0" />
+    <title>Bill</title>
+    <style type="text/css">
+    body {
+      width: 400px;
+      font-family: Calibri;
+    }
+    /*General purpose styling classes */
+    .center {
+      text-align: center;
+    }
+    .inline {
+      display: inline-block;
+    }
+    .side_order {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    #res_name{
+       font-size: 12px;
+    }
+
+    /*Div specific styling classes */
+    #rest_name {
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    #rest_address {
+      font-size: 12px;
+    }
+    #serial_no {
+      font-size: 12px;
+    }
+    #date_time {
+      overflow: auto;
+      
+    }
+    #date {
+      float:left;
+      font-size: 12px;
+    }
+    #time {
+      float: left;
+      font-size: 12px;
+    }
+    #order_no {
+      font-size: 12px;
+	font-weight: bold;
+    }
+    #items {
+      text-align: center;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #items thead {
+      border-top: 1px solid;
+      border-bottom: 1px solid;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    #items tbody, #tin_no, #st_no {
+      font-size: 11px;
+    }
+    #items #spacer td {
+      padding-top: 50px;
+    }
+    #items #amount_row {
+      
+      border-top: 1px solid;
+      border-bottom: 1px solid;
+    }
+    #items #amount_row #amount_text {
+      
+      text-align: left;
+    }
+    #footer {
+      border: 1px dotted;
+      font-size: 11px;
+    }
+    #contact_us {
+      margin-top: 10px;
+      overflow: auto;
+    }
+    #talk_text {
+      float: left;
+      margin-right: 70px;
+    }
+    #icons {
+      float: left;
+    }
+    .leftside {
+        float: left;
+    }
+    #icons img {
+      height: 20px;
+      width: 20px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    #thank_you {  
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    .item {
+     
+      margin: 0 auto;
+    }
+    #savings {
+       font-size: 12px;
+
+    }
+    #gstallign {
+      float: left;
+    }
+    #outlet_id {
+      font-size: 12px;
+    }
+   #slash {
+      font-size: 12px;
+    }
+   #restaurant_id {
+      font-size: 12px;
+    }
+#address {
+      font-size: 12px;
+    }
+
+    </style>
+  </head>
+  <body>
+    <br>
+    <div id="rest_name" class="center">FRSHLY</div>
+    <br>
+    <div id="tin_no" class="left">GSTIN NO:</div>
+    <div id="res_name" class="left">Name:</div>
+<table>
+    <tr>
+        <td id="rest_address" valign="top">Address:</td>
+        <td>
+            <textarea  id="address" cols="25" rows="4"></textarea>
+        </td>
+    </tr>
+</table>
+
+
+<div>
+<div class='inline'><div><div id="serial_no" class="left" class='inline'>Invoice No:&nbsp;FY17-18/OTPL/</div></div></div>
+   <div class='inline'><div id="restaurant_id"></div></div>
+   <div class='inline'><div id="slash">/</div></div>
+   <div class='inline'><div id="outlet_id"></div></div>
+   <div class='inline'><div id="slash">/</div></div>
+   <div class='inline'> <div id="order_no"></div> </div>
+</div>
+
+
+    <div id="date_time"><div id="date" class="inline">Date : 09/06/2015</div><div id="time" class="inline">&nbsp; Time - 12:59:00</div></div>
+    &nbsp;
+    <table id="items">
+      <thead>
+        <td>S.No</td>
+        <td>Description of goods</td>
+        <td>Hsn Code</td>
+        <td>Qty/Unit</td>
+        <td>Rate (per item)</td>
+        <td>Rate of tax</td>
+        <td>Taxable Value</td>
+      </thead>
+      <tbody>
+        <tr id="spacer">
+          <td></td><td></td><td></td>
+          </tr>
+        <tr id="amount_row">
+          <td colspan="2" id="amount_text" class="">Total Taxable Value</td>
+          <td></td><td></td><td></td><td></td>
+          <td id="amount_val">18</td>
+        </tr>
+        <tr>
+          </tr>
+        <td colspan="2" id="gstallign">CGST</td>
+        <td></td><td></td><td></td><td></td>
+          <td><div id="cgstvalue"></div></td>
+          <td id="amount_cgst">8</td>
+          </tr>
+	   <tr>
+          <td colspan="2" id="gstallign">SGST</td>
+          <td></td><td></td><td></td><td></td>
+          <td><div id="sgstvalue"></div></td>
+          <td id="amount_sgst">8</td>
+          </tr>
+        </tr>
+        <tr id="amount_row">
+          <td colspan="2" id="amount_text">Total Value</td>
+          <td></td><td></td><td></td><td></td>
+          <td id="amount_num">125</td>
+        </tr>
+      </tbody>
+    </table><br>
+
+<div class='inline' class="center"><div><div id="serial_no" align="center">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+Your Order Number is &nbsp;</div></div></div>
+   <div class='inline'> <div id="order_no"></div> </div>
+
+
+    <tr id="amount_row">
+    <div id="savings">Declaration :</div><br>
+    <div id="footer">
+      <div class="center">A service facilitated by Frshly.</div>
+      <div id="contact_us">
+        <div id="talk_text">Talk to us:</div>
+        <div id="icons">
+          <div id="mail"><img src="img/email.png" />feedback@frshly.com</div>
+          <div id="fb"><img src="img/fb.png" />gofrshly</div>
+          <div id="twitter"><img src="img/twitter.png" />gofrshly</div>
+        </div>
+      </div>
+    </div>
+    <div id="thank_you" class="center">Thank you! enjoy your meal!</div><br>
+     <div id="thank_you" class="center">This invoice is a computer Generated Invoice</div>
+    			
+
+  </body>
+</html>

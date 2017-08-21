@@ -1,0 +1,129 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat app</title>
+    <style type="text/css">
+
+    </style>
+
+    <script type="text/javascript" src="js/firebase.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+
+  </head>
+  <body>
+    <div id="thread_list">Adyar Ananda Bhavan</div>
+    Outlet id- <input type="text" id="outlet_id" /><br />
+    Group name- <input type="text" id="group_name" /><br />
+    Thread id / title - <input type="text" id="thread_text" /><br />
+    Chat text - <input type="text" id="chat_text" /><br />
+    <button id="add_comment">Add new comment</button>
+    <button id="add_thread">Create new thread</button><br />
+    <br />
+    Showing all threads for HQ with role as operations
+    <div id="threads"></div>
+    <br />
+    Comments for a thread -
+    <div id="comments"></div>
+    <script type="text/javascript">
+
+/*{ This is the data structure of the chat app
+    "threads": {
+        "thread1": {
+            "title": "This is the title of the thread",
+            "outlet_id": 1,
+            "comments": {
+                "comment1": true
+            },
+            "groups": [
+                "HQ",
+                "sales"
+            ]
+        }
+    },
+    "comments": {
+        "comment1": {
+            "thread_id": "thread1",
+            "body": "This is a great comment",
+            "timestamp": "7/16/2015, 3:28:58 PM"
+        }
+    }
+}*/
+
+      var CHAT_URL = "https://atp-chat.firebaseio.com";
+      var commentsRef = new Firebase(CHAT_URL + "/comments");
+      var threadsRef = new Firebase(CHAT_URL + "/threads");
+
+      $("#add_comment").click(function() {
+        var comment_text = $("#chat_text").val();
+        var thread_id = $("#thread_text").val();
+        var id = commentsRef.push();
+        var comment = {"thread_id": thread_id,
+            "body": comment_text,
+            "timestamp": (new Date()).toLocaleString()
+          };
+        id.set(comment, function(err) {
+          if (!err) {
+            var name = id.key();
+            threadsRef.child("/" + thread_id + "/comments/" + name).set(true);
+          } else {
+            console.error(err);
+          }
+        });
+      });
+
+      $("#add_thread").click(function() {
+        var id = threadsRef.push();
+        var outlet_id = $("#outlet_id").val();
+        var group_name = $("#group_name").val();
+        var thread_title = $("#thread_text").val();
+        var thread_content = {"title": thread_title,
+            "outlet_id": outlet_id,
+            "comments": {},
+            "groups": [group_name]
+          };
+        id.set(thread_content, function(err) {
+          if (err) {
+            console.error(err);
+          }
+        });
+      });
+
+      // To display the list of thread on the outlet side
+      threadsRef.on("child_added", function(snap) {
+        var thread_id = snap.key();
+        var thread_content = snap.val();
+        if (thread_content.outlet_id == 1) {
+          $("#threads").append("<div><a onClick='displayComments(\""+thread_id+"\");' href='#'>"+thread_content.title+"</a>  "+ thread_id +"</div>");
+        }
+      });
+
+      // To display the list of threads on the HQ side
+      /*threadsRef.on("child_added", function(snap) {
+        var thread_id = snap.key();
+        var thread_content = snap.val();
+        if (thread_content.groups.indexOf("operations") != -1) {
+          $("#threads").append("<div><a onClick='displayComments(\""+thread_id+"\");' href='#'>"+thread_content.title+"</a>  "+ thread_id +"</div>");
+        }
+      });*/
+
+      // Displays the comments in a single thread
+      function displayComments(thread_id) {
+        $("#comments").empty();
+        var threadCommentsRef = threadsRef.child(thread_id).child("comments");
+        threadCommentsRef.once("value", function(snap) {
+          snap.forEach(function(childSnapshot) {
+            commentsRef.child(childSnapshot.key()).once("value", function(comment_val) {
+              // Render the comment on the link page.
+              var comment = comment_val.val().body;
+              var comment_timestamp = comment_val.val().timestamp;
+              $("#comments").append("<div>"+ comment +"</div>");
+            });
+          });
+        });
+      };
+
+    </script>
+  </body>
+</html>

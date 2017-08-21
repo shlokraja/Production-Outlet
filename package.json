@@ -1,0 +1,58 @@
+{
+  "name": "outlet_app",
+  "version": "0.0.0",
+  "description": "NodeJS App for the Outlet side",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "./node_modules/.bin/mocha test --recursive",
+    "nodemon": "nodemon ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheFoodBox/Foodbox-Outlet.git"
+  },
+  "author": "CIRA developers",
+  "license": "proprietory",
+  "bugs": {
+    "url": "https://github.com/TheFoodBox/Foodbox-Outlet/issues"
+  },
+  "homepage": "https://github.com/TheFoodBox/Foodbox-Outlet",
+  "dependencies": {
+    "async": "^1.2.1",
+    "body-parser": "~1.12.4",
+    "cheerio": "^0.19.0",
+    "cookie-parser": "~1.3.5",
+    "cors": "^2.7.1",
+    "cron": "^1.0.9",
+    "debug": "^2.2.0",
+    "express": "~4.12.4",
+    "firebase": "^2.2.5",
+    "firebase-queue": "^1.2.1",
+    "hogan-express": "^0.5.2",
+    "html-pdf": "^1.2.1",
+    "lockredis": "^1.0.0",
+    "morgan": "~1.5.3",
+    "node-ka-patch": "0.0.3",
+    "pg": "^4.3.0",
+    "phantomjs": "^1.9.17",
+    "q": "^1.4.1",
+    "randomstring": "^1.1.3",
+    "redis": "^0.12.1",
+    "request": "^2.57.0",
+    "requestretry": "^1.6.0",
+    "serve-favicon": "~2.2.1",
+    "socket.io": "^1.3.5",
+    "socket.io-client": "^1.4.6",
+    "string-format": "^0.5.0",
+    "tofixed": "^1.0.0",
+    "underscore": "~1.8.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "nodemon": "^1.3.7",
+    "should": "^6.0.3",
+    "supertest": "^1.0.1"
+  }
+}

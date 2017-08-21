@@ -1,0 +1,14 @@
+ulimit -c unlimited
+# set the fd limit to 32k
+ulimit -n 32768
+# set the core pattern to [executable].[unixtimestamp].[pid]
+sysctl -w "kernel.core_pattern=/var/coredumps/%e.%t.%p.core"
+
+#source common file
+. /opt/foodbox_outlet/.bootstraprc
+
+current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+LOG_FILE="log.$current_time"
+
+BIN="/opt/foodbox_outlet/bin/www"
+INIT_CMD="/usr/bin/node $BIN"

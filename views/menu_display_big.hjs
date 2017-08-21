@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Outlet Dashboard</title>
+    <style type="text/css">
+      body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+      }
+      #imageframe {
+       margin: 0px;
+       height: 100%;
+       width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <img id="targetimg" src='/menu_display/bigimage.png' width="1280" height="720" />
+  </body>
+  <script>
+  var img = document.getElementById("targetimg");
+  setInterval(function() {
+    var src = img.src;
+    // check for existing ? and remove if found
+    queryPos = src.indexOf('?');
+    if(queryPos != -1) {
+      src = src.substring(0, queryPos);
+    }
+    img.src = src + '?' + Math.random();
+  }, 5000);
+  </script>
+</html>

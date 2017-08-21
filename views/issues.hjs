@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include roboto.css to use the Roboto web font, material.css to include the theme and ripples.css to style the ripple effect -->
+    <link href="css/roboto.min.css" rel="stylesheet">
+    <link href="css/material.min.css" rel="stylesheet">
+    <link href="css/ripples.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <title>Issues</title>
+    <style type="text/css">
+      #issues {
+        margin: 20px;
+      }
+      #home_link {
+        margin-left: 20px;
+        font-size: 15px;
+        color: #03a9f4;
+      }
+      #issues .panel_header .food_btn {
+        margin-left: 300px;
+        text-transform: capitalize;
+      }
+      #issues .panel_header .non_food_btn {
+        text-transform: capitalize;
+      }
+      #issues .prev_day {
+        margin-left: 200px;
+        color: #03a9f4;
+      }
+      #issues .prev_day, #issues .next_day {
+        padding: 5px;
+        color: #03a9f4;
+      }
+      #date_selector {
+        border: none;
+        color: #03a9f4;
+        text-align: center;
+        font-size: 15px;
+        vertical-align: sub;
+        margin-left: 30px;
+      }
+      #issues  .non_food_issues {
+        table-layout: fixed;
+      }
+      #issues .non_food_issues thead .issue {
+        width: 200px;
+      }
+      #issues .non_food_issues thead .note {
+        width: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <a id="home_link" class="threads" href="/">&lt; Home</a>
+    <div id="issues" class="panel">
+      <div class="panel_header">
+      <img class="icon" src="img/icons/Issues.png">
+      <h4>Issues</h4>
+      <button class="food_btn
+        btn btn-flat btn-default">Food</button>
+      <button class="non_food_btn
+        btn btn-flat btn-default">Non-Food</button>
+      <button class="prev_day btn btn-raised btn-default">&lt;</button>
+      <span class="filter_text"></span>
+      <input id="date_selector" type="date" />
+      <button class="next_day btn btn-raised btn-default">&gt;</button>
+      </div>
+      <table class="food_issues table table-striped table-hover ">
+        <thead>
+          <tr>
+            <th>Food item name</th>
+            <th>Problem</th>
+            <th>Note</th>
+            <th>PO creation time</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <table class="non_food_issues table table-striped table-hover ">
+        <thead>
+          <tr>
+            <th class="issue">Issue</th>
+            <th>Problem</th>
+            <th class="note">Note</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ripples.min.js"></script>
+    <script src="js/material.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <script src="js/simpleStorage.js"></script>
+    <script src="js/firebase.js"></script>
+    <script>
+      // global variables
+      HQ_URL = '{{ hq_url }}';
+      OUTLET_ID = '{{ outlet_id }}';
+      OUTLET_URL = '{{ outlet_host }}{{ outlet_port }}';
+      WEBSOCKET_URL = '{{ outlet_host }}{{ websocket_port }}';
+      socket = io.connect(WEBSOCKET_URL);
+    </script>
+    <script src="js/issues.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      $(document).ready(function() {
+        // Initializing material design
+        $.material.init();
+        // Set the date to current day and populate issues.
+        var d = new Date();
+        $("#issues #date_selector").val(d.yyyymmdd());
+
+        // triggering the click of food_item issues to populate the panel
+        $("#issues .panel_header .food_btn").trigger("click");
+      });
+    </script>
+  </body>
+</html>

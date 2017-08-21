@@ -1,0 +1,38 @@
+export NODE_ENV=development
+export DEBUG=outlet_app:server
+export PORT=8000
+export WEBSOCKET_PORT=8000
+
+export DEBUG_FD=1
+export FIREBASE_QUEUE=https://atp-chat.firebaseio.com/queue
+
+#export HQ_URL=http://122.183.251.106:8008
+export HQ_URL=http://115.114.95.35:8008
+export OUTLET_HOST=http://192.168.1.47:
+export PRINTER_URL=http://localhost:631
+#DB credentials stuff
+
+#export DB_CONN=postgres://agniva:foodbox123@localhost/foodbox
+
+#Firebase link
+export FIREBASE_CONN=https://torrid-fire-8553.firebaseio.com
+
+#Outlet ID
+export OUTLET_ID=17
+export OUTLET_CODE=SPI
+#Image location export
+export SOURCE_FOLDER=/home/ubuntu/images
+
+export MENU_DISPLAY_FOLDER=/home/ubuntu
+export MENU_DISPLAY_IPS=192.168.1.8,192.168.1.6,192.168.1.7,192.168.1.5
+export SMS_USERNAME=atchayam
+export SMS_PASSWORD=123456
+export SMS_URL=http://whitelist.smsapi.org/SendSMS.aspx
+
+#Mobile settings
+export SERVER_PORT=9099
+export LISTEN_PORT=9097
+
+#EXPIRY_TIME_INTERVAL in minutes
+export EXPIRY_TIME_INTERVAL=5
+export TEST_MODE_TIME=10
