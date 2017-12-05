@@ -55,7 +55,7 @@ redisClient.on('error', function (msg) {
 server_ip_address = "115.114.95.35";
 var firebase_connection = "https://torrid-fire-8553.firebaseio.com";
 var firebase_queue = "https://atp-chat.firebaseio.com/queue";
-var outlet_id = 17;
+var outlet_id = 1;
 var hq_url = "http://115.114.95.35:8008";
 server_port = '9099';
 var router = express();
@@ -1720,7 +1720,10 @@ function getItemDetails() {
                             "address": data[i]["r_address"],
                             "st_no": data[i]["r_st_no"],
                             "pan_no": data[i]["r_pan_no"],
-                            "tin_no": data[i]["r_tin_no"]
+                            "tin_no": data[i]["r_tin_no"],
+                            "cgst_percent": data[i]["r_cgst_percent"],
+                            "sgst_percent": data[i]["r_sgst_percent"],
+                            "entity": data[i]["r_entity"]
                         },
                         "coke_details": {
                             "id": data[i]["b_id"],
@@ -1737,7 +1740,10 @@ function getItemDetails() {
                                             "address": data[i]["b_r_address"],
                                             "st_no": data[i]["r_st_no"],
                                             "pan_no": data[i]["r_pan_no"],
-                                            "tin_no": data[i]["b_r_tin_no"]
+                                            "tin_no": data[i]["b_r_tin_no"],
+                                            "cgst_percent": data[i]["r_cgst_percent"],
+                                            "sgst_percent": data[i]["r_sgst_percent"],
+                                            "entity": data[i]["r_entity"]
                                         }
                         },
                         "heating_reqd": data[i]["heating_required"],
@@ -1769,6 +1775,7 @@ function prepareBillToPrint(order_details, sides) {
     var bill_items = [];
     for (var item_id in order_details)
     {
+        order_details[item_id].restaurant_details=food_item_data[item_id]["restaurant_details"];
         bill_items.push({
             "name": order_details[item_id]["name"],
             "count": order_details[item_id]["count"],
@@ -1777,7 +1784,11 @@ function prepareBillToPrint(order_details, sides) {
             "restaurant_id": food_item_data[item_id]["restaurant_details"]["id"],
             "tin_no": food_item_data[item_id]["restaurant_details"]["tin_no"],
             "st_no": food_item_data[item_id]["restaurant_details"]["st_no"],
-            "restaurant_name": food_item_data[item_id]["restaurant_details"]["name"]
+            "cgst_percent": food_item_data[item_id]["restaurant_details"]["cgst_percent"],
+            "sgst_percent": food_item_data[item_id]["restaurant_details"]["sgst_percent"],
+            "entity": food_item_data[item_id]["restaurant_details"]["entity"],
+            "address": food_item_data[item_id]["restaurant_details"]["address"],
+            "restaurant_name": food_item_data[item_id]["restaurant_details"]["name"]            
         });
     }
     if (sides)
@@ -1792,6 +1803,10 @@ function prepareBillToPrint(order_details, sides) {
                 "restaurant_id": food_item_data[item_id]["restaurant_details"]["id"],
                 "tin_no": food_item_data[item_id]["restaurant_details"]["tin_no"],
                 "st_no": food_item_data[item_id]["restaurant_details"]["st_no"],
+                "cgst_percent": food_item_data[item_id]["restaurant_details"]["cgst_percent"],
+                "sgst_percent": food_item_data[item_id]["restaurant_details"]["sgst_percent"],
+                "entity": food_item_data[item_id]["restaurant_details"]["entity"],
+                "address": food_item_data[item_id]["restaurant_details"]["address"],
                 "restaurant_name": food_item_data[item_id]["restaurant_details"]["name"]
             });
         }

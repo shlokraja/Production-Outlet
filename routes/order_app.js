@@ -15,6 +15,7 @@ var helper = require('./helper');
 var startPrint = require('../misc/printer').startPrint;
 var sendUpdatedSMS = require('../misc/printer').sendUpdatedSMS;
 var isForcePrintBill = require('../misc/isForcePrintBill');
+var _ = require('underscore');
 
 
 format.extend(String.prototype);
@@ -104,7 +105,39 @@ router.post('/place_order', function (req, res, next) {
           io.emit('beverage_orders', {
             bill_no: bill_no,
             sides: sides
-          });
+           });
+
+          if (from_counter) {
+              var order_item_list = get_sales_order_items(order_details);
+console.log("After Done remove queue_list");
+              // Get and update pending_done queue in redis.
+              redisClient.get(helper.pending_done_node, function (err, reply) {
+                  if (err) {
+                      console.log(err);
+                  } else {
+                      if (reply) {
+                          // The queue already exist so we are updating pending_done queue .
+                          var queue_list = JSON.parse(reply);
+console.log("remove queue_list");
+console.log(queue_list);
+                          _.each(order_item_list, function (value, key) {
+                              // Check new order item_id exist or not.
+                              // If exist update the count else push new item.
+                              if (queue_list.hasOwnProperty(key)) {
+                                  queue_list[key] -= value;
+
+                                  if (queue_list[key] <= 0) {
+                                      delete queue_list[key];
+                                  }
+                              }
+                          });
+
+                          // set updated items in redis queue.
+                          update_pending_done(queue_list);
+                      }
+                  }
+              });
+          }
 
           var locker = lockredis(redisClient);
           locker('lock_item', {
@@ -464,6 +497,52 @@ router.post('/place_order', function (req, res, next) {
             "cardholder_name": cardholder_name,
             "unique_Random_Id": unique_Random_Id
           });
+
+          // Prepare pending_done Queue. 
+          var order_item_list = get_sales_order_items(order_details);
+console.log("order_item_list:");
+console.log( order_item_list);
+          // Get and update pending_done queue in redis.
+          redisClient.get(helper.pending_done_node, function (err, reply) {
+              if (err) {
+                  console.log(err);
+              } else {
+                  if (reply) {
+                      // The queue already exist so we are updating pending_done queue .
+                      var queue_list = JSON.parse(reply);
+		      console.log("Queue_list:");
+console.log(queue_list);
+                      _.each(order_item_list, function (value, key) {
+                          // Check new order item_id exist or not.
+                          // If exist update the count else push new item.
+                          if (queue_list.hasOwnProperty(key)) {
+                              queue_list[key] += value;
+                          }
+                          else {
+                              queue_list[key] = value;
+                          }
+                      });
+                      // set updated items in redis queue.
+                      update_pending_done(queue_list);
+
+                  } else {
+                      // we inserting new queue items in redis.
+                      var json_order_item_list = JSON.stringify(order_item_list);
+console.log ("json_order_item_list:");
+console.log (json_order_item_list);
+                      redisClient.set(helper.pending_done_node, json_order_item_list,
+                          function (lp_err, lp_reply) {
+                              if (lp_err) {
+                                  console.error(err);
+                              }
+                              else {
+                                  console.log("Pushing done pending item succesful.... " + json_order_item_list);
+                              }
+                          }
+                      );
+                  }
+              }
+          });
         }
         redisClient.get(helper.stock_count_node, function (err, reply) {
           var parsed_response = JSON.parse(reply);
@@ -491,7 +570,32 @@ router.post('/place_order', function (req, res, next) {
   }
 });
 
+function get_sales_order_items(sales_order_details) {
+    // Prepare order items. 
+    var order_items = {};
 
+    _.each(sales_order_details, function (value, key) {
+        order_items[key] = value.count;
+    });
+
+    return order_items;
+}
+
+// Update Pending_done queue.
+function update_pending_done(queue_list) {
+    var json_queue_list = JSON.stringify(queue_list);
+
+    redisClient.set(helper.pending_done_node, json_queue_list,
+        function (lp_err, lp_reply) {
+            if (lp_err) {
+                console.error(err);
+            }
+            else {
+                console.log("Updating done pending item succesful.... " + json_queue_list);
+            }
+        }
+    );
+}
 
 function GetFormattedDateDDMMYYYY() {
   var d = new Date,
@@ -886,9 +990,33 @@ router.post('/lock_item/:item_id', function (req, res, next) {
   var delta_count = parseInt(req.body.delta_count);
   debug("Locking item id - ", item_id, " in direction- ", req.body.direction, " for quantity- ", delta_count);
   if (req.body.direction == "increase") {
-    redisClient.incrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+                  
+		    redisClient.incrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+
   } else if (req.body.direction == "decrease") {
-    redisClient.decrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+  	redisClient.decrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+  } else if (req.body.direction == "decreaseCL") {
+
+      // Check the item exist in pending_done queue.
+      redisClient.get(helper.pending_done_node, function (err, reply) {
+          if (err) {
+              console.log(err);
+          } else {
+              if (reply) {
+                  var queue_list = JSON.parse(reply);
+                  
+                  if (queue_list.hasOwnProperty(item_id)) {
+                      redisClient.decrby(item_id + '_locked_count', (delta_count - queue_list[item_id]), update_lock_count_callback);
+                      console.log("Item id: " + item_id + " is already have " + queue_list[item_id] + " Qty in pending_done queue.");
+                  }
+                  else {
+                      redisClient.decrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+                  }
+              } else{
+                  redisClient.decrby(item_id + '_locked_count', delta_count, update_lock_count_callback);
+              }
+          }
+      });
   }
 
   function update_lock_count_callback(l_err, l_reply) {

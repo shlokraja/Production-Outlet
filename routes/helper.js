@@ -22,5 +22,6 @@ module.exports = {
     barcode_comparision: 'barcode_comparision',
     po_details_node: 'po_details',
     reconcile_remarks_node: 'reconcile_remarks',
-    session_time_node:'outlet_session_timings'
+    session_time_node: 'outlet_session_timings',
+    pending_done_node: 'pending_done'
 };
