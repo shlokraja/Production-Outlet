@@ -2,7 +2,6 @@
 //    AutomaticReconcile(false);
 //};
 
-
 // Utility code to get the current month
 var d = new Date();
 var month = new Array();
@@ -22,6 +21,148 @@ var n_month = month[d.getMonth()];
 
 var food_item_data = {};
 
+$("#btnlogout").click(function ()
+{
+    $.ajax({
+        type: 'get',
+        url: OUTLET_URL + '/users/checkLogout',
+        success: function (data)
+        {
+            data = JSON.parse(data);
+            if (data.pendingreconcile != null && data.pendingreconcile == false)
+            {
+                OpenSales_Details_Modal();
+            }
+            else
+            {
+                $.toaster({ priority: 'danger', message: "Please Complete Reconcile to logout" });
+            }
+        },
+        error: function (jqxhr, textStatus, error)
+        {
+            var err_msg = textStatus + ", " + jqxhr.responseText;
+            console.error("Check Logout Failed" + err_msg);
+        },
+        contentType: "application/json",
+        dataType: 'text'
+    });
+})
+
+var OpenSales_Details_Modal = function ()
+{
+    $.ajax({
+        type: 'get',
+        url: OUTLET_URL + '/users/getSalesDetails',
+        success: function (data)
+        {
+            data = JSON.parse(data);
+            data = JSON.parse(data.sales_details);
+            if (data != null)
+            {
+                var sales_html = "";
+                var cashTotal = 0;
+                var cardTotal = 0;
+                var sodexocardTotal = 0;
+                var sodexocouponTotal = 0;
+                var creditTotal = 0;
+                var gprscardTotal = 0;
+                var walletTotal = 0;
+                var Total = 0;
+
+                var ScannedCount = 0;
+                var UnscannedCount = 0;
+                var DamagedCount = 0;
+                var ExpiryCount = 0;
+                var UndeliveredCount = 0;
+                var RestaurantFaultCount = 0;
+
+                var Totaltaken = 0;
+                var TotalSold = 0;
+
+                for (var i = 0; i < data.length; i++)
+                {
+                    var item_Total = 0;
+                    var salesdata = data[i];
+                    sales_html += "<tr>";
+
+                    sales_html += "<td style='text-align:center;'>" +salesdata.po_id + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.restaurantname + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.session + "</td>";
+                    sales_html += "<td style='text-align:left; width:200px'>" + salesdata.name + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.scanned + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.unscanned + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.damaged + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.expiry + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.restaurantfault + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.undelivered + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.taken + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sold + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.cash + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.card + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sodexocard + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sodexocoupon + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.credit + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.gprscard + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.wallet + "</td>";
+                    item_Total = salesdata.cash + salesdata.card + salesdata.sodexocard + salesdata.sodexocoupon + salesdata.credit + salesdata.gprscard + salesdata.wallet;
+                    sales_html += "<td style='text-align:right;'>" + item_Total + "</td>";
+                    sales_html += "</tr>";
+                    cashTotal += salesdata.cash;
+                    cardTotal += salesdata.card;
+                    sodexocardTotal += salesdata.sodexocard;
+                    sodexocouponTotal += salesdata.sodexocoupon;
+                    creditTotal += salesdata.credit;
+                    gprscardTotal += salesdata.gprscard;
+                    walletTotal += salesdata.wallet;
+                    Total += item_Total;
+                    Totaltaken += Number(salesdata.taken);
+                    TotalSold += Number(salesdata.sold);
+
+                    ScannedCount += Number(salesdata.scanned);
+                    UnscannedCount += Number(salesdata.unscanned);
+                    DamagedCount += Number(salesdata.damaged);
+                    ExpiryCount += Number(salesdata.expiry);
+                    RestaurantFaultCount += Number(salesdata.restaurantfault);
+                    UndeliveredCount += Number(salesdata.undelivered);
+
+                }
+
+                sales_html += "<tr style='font-weight: bolder;'>";
+                sales_html += "<td>Total: </td>";
+                sales_html += "<td></td>";
+                sales_html += "<td></td>";
+                sales_html += "<td></td>";
+                sales_html += "<td style='text-align:right;'>" + ScannedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + UnscannedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + DamagedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + ExpiryCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + RestaurantFaultCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + UndeliveredCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + Totaltaken + "</td>";
+                sales_html += "<td style='text-align:right;'>" + TotalSold + "</td>";
+                sales_html += "<td style='text-align:right;'>" + cashTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + cardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + sodexocardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + sodexocouponTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + creditTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + gprscardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + walletTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + Total + "</td>";
+                sales_html += "</tr>";
+
+                $("#Sales_details_table").html(sales_html);
+                $("#sales-details-dialog").modal({ show: true, backdrop: "static" });
+            }
+        },
+        error: function (jqxhr, textStatus, error)
+        {
+            var err_msg = textStatus + ", " + jqxhr.responseText;
+            console.error("Get Sales Details Failed" + err_msg);
+        },
+        contentType: "application/json",
+        dataType: 'text'
+    });
+}
 
 $("#notifications").on("click", ".notification", function () {
     var category = $(this).find(".category").text();
@@ -743,6 +884,7 @@ $("#incoming-po-reconcile-modal .modal-footer .incoming_po_reconcile").click(fun
                       rest_fault_qty: rest_fault_qty,
                       remarks: remarks,
                       processed_by: 'manual',
+                      is_reconciled_item: true,
                       valid_po_items_barcodes: valid_po_items_barcodes
                   });
 
@@ -1112,9 +1254,22 @@ $("#force-failure-dialog .modal-footer .mark_failed").click(function () {
     $("#force-failure-dialog").modal("hide");
 });
 
+function ConvertToBoolean(val)
+{
+    if (val == "true")
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 function checkStartOfDay() {
     // check if outlet is not 24hr and start of day flag is enabled
-    if (!is24hr && start_of_day)
+    is24hr = false;
+    if (!ConvertToBoolean(is24hr) && start_of_day)
 {
         var tableDiv = $("#sod-dialog .modal-body table tbody");
         $(tableDiv).empty();

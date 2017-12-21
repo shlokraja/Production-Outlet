@@ -520,10 +520,11 @@ $("#refund_ok").click(function ()
 	{
 		return;
 	}
+	var user_id = simpleStorage.get("loggedinuserid");
 	$.ajax({
 		type: 'POST',
 		url: HQ_URL + '/outlet/refund_items/' + order_id,
-		data: JSON.stringify({ "amount": total_price, "item_details": item_details , "bill_no": bill_no, "mobile_num": mobile_num }),
+		data: JSON.stringify({ "amount": total_price, "item_details": item_details, "bill_no": bill_no, "mobile_num": mobile_num, "userid": loggedinuserid }),
 		success: function (data)
 		{
 			//openOrderItems(order_id, mobile_num, this);

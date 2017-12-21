@@ -370,6 +370,13 @@ console.log(queue_list);
                     debug("Placing order to HQ");
                     var bill_time = GetFormattedDateDDMMYYYY();
 
+                              var userid = loggedinuserid;
+                              if (loggedinuserid == null || loggedinuserid == 0)
+                              {
+                                  userid = 1;
+                              }
+                              console.log("*****************UserID*************" + userid);
+
                     var obj = {
                       "name": "ORDER_DETAILS",
                       "order_details": order_details,
@@ -386,7 +393,8 @@ console.log(queue_list);
                       "unique_Random_Id": unique_Random_Id,
                       "is_mobile_order": false,
                       "bill_time": bill_time,
-                      "bill_status": "Pending"
+                      "bill_status": "Pending",
+                      "userid": userid
                     }
 
                     //console.log("Outlet Object for DirectBillURL **** " + JSON.stringify(obj));
@@ -432,7 +440,8 @@ console.log(queue_list);
                       "bill_no": bill_no,
                       "food_details": bill_dict,
                       "unique_Random_Id": unique_Random_Id,
-                      "is_mobile_order": false
+                      "is_mobile_order": false,
+                      "userid": userid
                     }); // after updating order details
                     debug("Successfully updated order details in HQ");
                     // pushing the item to the queue
@@ -803,7 +812,8 @@ router.post('/fulfill_replacement/:id', function (req, res, next) {
           "item_details": old_item_details,
           "bill_no" : original_bill_no,
           "replaced_amount": replaced_amount,
-          "replaced_item_details": replaced_item_details
+          "replaced_item_details": replaced_item_details,
+          "userid": loggedinuserid
         }
       }, function (error, response, body) {
           if (error || (response && response.statusCode != 200)) {

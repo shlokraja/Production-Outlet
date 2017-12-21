@@ -11,7 +11,6 @@ function checkEOD() {
     }
 }
 
-
 function showEODDialog()
 {
     // iterate the supply list, populate the eod dialog
@@ -39,8 +38,6 @@ function showEODDialog()
         dataType: 'text'
     });
 }
-
-
 
 function getSupplyItems()
 {
@@ -290,10 +287,10 @@ function CheckTestMode() {
 // This is the primary function that calls all other functions and
 // gets things started
 
-function initDataBindings()
+function StartDataBindings()
 {
     // Initial set of calls
-	CheckTestMode();
+    CheckTestMode();
     getSalesData();
     getItemDetails();
     getStaffRoster();
@@ -301,11 +298,11 @@ function initDataBindings()
     getBeverages();
     getMobilePendingOrder();
     // Calls which are to be repeated
-	setInterval(CheckTestMode, 5000);
+    setInterval(CheckTestMode, 5000);
     setInterval(getItemDetails, 300000);
     setInterval(getSalesData, 300000);
     setInterval(getLivePOs, 300000);
-   // setInterval(checkEOD, 60000);
+    // setInterval(checkEOD, 60000);
     setInterval(getMobilePendingOrder, 1000000);
     // This will run only once
     getSupplyItems();
@@ -314,3 +311,109 @@ function initDataBindings()
     // in other pages, it reads off from local storage
     readSocketEvents();
 }
+
+function initDataBindings()
+{
+    $.ajax({
+        type: 'get',
+        url: OUTLET_URL + '/users/CheckLogin',
+        success: function (data)
+        {
+            data = JSON.parse(data);
+            if (data.userid == null || data.userid == 0)
+            {
+                $("#Login").modal({ show: true, backdrop: "static" });
+            }
+            else
+            {
+                simpleStorage.set("loggedinuserid", data.userid);
+                $("#username").text(data.username);
+                StartDataBindings();
+            }
+        },
+        error: function (jqxhr, textStatus, error)
+        {
+            var err_msg = textStatus + ", " + jqxhr.responseText;
+            console.error("Check Login Failed" + err_msg);
+        },
+        contentType: "application/json",
+        dataType: 'text'
+    });
+}
+
+//Login
+$('#btnLogin').click(function ()
+{
+    var username = $('#user_name').val();
+    var password = $('#password').val();
+
+    if (username == "" || username == null)
+    {
+        $('#user_name_label').addClass('text-danger');
+        $('#user_name_Help').text('User Name should not be Empty or greater than 3 characters');
+        $('#user_name_Help').show();
+        return;
+    }
+    if (password == "" || password == null || password.length <= 3)
+    {
+        $('#password_label').addClass('text-danger');
+        $('#password_Help').text('Password should not be Empty or greater than 3 characters');
+        $('#password_Help').show();
+        return;
+    }
+    var obj = new Object();
+
+    obj.user = username;
+    obj.password = password;
+
+    $.ajax({
+        type: 'POST',
+        url: OUTLET_URL + '/users/Login',
+        contentType: "application/json",
+        data: JSON.stringify({"user" : username , "password" : password}),
+        success: function (data)
+        {
+            $("#Login").modal("hide");
+            $.toaster({ priority: 'success', message: data });
+            initDataBindings();
+        },
+        error: function (jqxhr, textStatus, error)
+        {
+            var err_msg = textStatus + ", " + jqxhr.responseText;
+            console.error("Check Login Failed" + err_msg);
+            $.toaster({ priority: 'danger', message: err_msg.toString() });
+        }
+    });
+});
+
+$('#sales_details_yes').click(function ()
+{
+    var remarks = $("#remarks").val();
+    var desiredremarks = remarks.replace(/[^\w\s]/gi, '');
+    var username = $("#username").text();
+    var htmlcontent = $("#sales_details_content").html();
+    $.ajax({
+        type: 'POST',
+        url: OUTLET_URL + '/users/Logout',
+        contentType: "application/json",
+        data: JSON.stringify({ "remarks": desiredremarks, "mailcontent": htmlcontent, "username": username }),
+        success: function (data)
+        {
+            $("#sales-details-dialog").modal("hide");
+            $.toaster({ priority: 'success', message: data });
+            initDataBindings();
+            $("#remarks").val('');
+        },
+        error: function (jqxhr, textStatus, error)
+        {
+            var err_msg = textStatus + ", " + jqxhr.responseText;
+            console.error("Check Login Failed" + err_msg);
+            $.toaster({ priority: 'danger', message: err_msg.toString() });
+        }
+    });
+});
+
+$('#sales_details_no').click(function ()
+{
+    $("#sales-details-dialog").modal("hide");
+});

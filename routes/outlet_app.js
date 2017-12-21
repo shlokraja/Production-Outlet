@@ -47,7 +47,7 @@ router.post('/test_mode', function (req, res, next) {
 		function (set_err, set_reply) {
 		    if (set_err)
 		    {
-		        console.error('error while inserting in redis- {}'.format(set_stock_count_err));
+		        console.error('error while inserting in redis- {}'.format(set_err));
 		        return;
 		    }
 		});
@@ -120,7 +120,7 @@ function ClearTestMode() {
 	redisClient.get("test_mode_details", function(err,res) {
 		if(err)
 		{
-			    console.error('error while inserting in redis- {}'.format(set_stock_count_err));
+		    console.error('error while inserting in redis- {}'.format(err));
 				return;
 		}
 		else {
@@ -132,7 +132,7 @@ function ClearTestMode() {
 				{
 					if (set_err)
 					{
-						console.error('error while inserting in redis- {}'.format(set_stock_count_err));
+					    console.error('error while inserting in redis- {}'.format(set_err));
 						return;
 					}
                 });
@@ -168,7 +168,7 @@ router.post('/test_mode_issue', function (req, res, next) {
         url: hq_url + TEST_MODE_ISSUES_URL + outlet_id,
         method: "POST",
         forever: true,
-        json: { "text": issue_text }
+        json: { "text": issue_text, "userid": loggedinuserid }
     },
         function (error, response, body) {
             if (error || (response && response.statusCode != 200)) {
@@ -242,7 +242,7 @@ router.post('/mark_spoilage', function (req, res, next) {
             method: "POST",
             forever: true,
             maxAttempts: 25,
-            json: { "barcodes": barcodes, "misc_notes": misc_notes }
+            json: { "barcodes": barcodes, "misc_notes": misc_notes, "userid": loggedinuserid }
         }, function (bill_error, bill_response, bill_body) {
             if (bill_error || (bill_response && bill_response.statusCode != 200)) {
                 console.error('{}: {} {}'.format(MARK_SPOILAGE_URL, bill_error, bill_body));
@@ -300,7 +300,7 @@ router.post('/force_fail_entire_stock', function (req, res, next) {
             url: FORCE_FAILURE_URL,
             method: "POST",
             forever: true,
-            json: { "outlet_id": outlet_id, "barcodes": barcodes, "misc_notes": misc_notes, "fail_all": fail_all }
+            json: { "outlet_id": outlet_id, "barcodes": barcodes, "misc_notes": misc_notes, "fail_all": fail_all, "userid": loggedinuserid }
         }, function (bill_error, bill_response, bill_body) {
             if (bill_error || (bill_response && bill_response.statusCode != 200)) {
                 console.error('{}: {} {}'.format(FORCE_FAILURE_URL, bill_error, bill_body));
@@ -348,7 +348,7 @@ router.post('/signal_expiry_item_removal', function (req, res, next) {
         requestretry({
             url: REMOVE_EXPIRED_URL,
             method: "POST",
-            json: { "barcodes": barcodes }
+            json: { "barcodes": barcodes, "userid": loggedinuserid }
         }, function (expire_error, expire_response, expire_body) {
             if (expire_error || (expire_response && expire_response.statusCode != 200)) {
                 console.error('{}: {} {}'.format(hq_url, expire_error, expire_body));
@@ -377,7 +377,7 @@ router.post('/signal_unscanned_item_removal', function (req, res, next) {
         url: REMOVE_UNSCANNED_URL,
         method: "POST",
         forever: true,
-        json: { "item_codes": item_codes }
+        json: { "item_codes": item_codes, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200)) {
             console.error('{}: {} {}'.format(hq_url, error, body));
@@ -452,7 +452,7 @@ router.post('/store_loading_issue_items', function (req, res, next) {
     requestretry({
         url: STORE_LOADING_ISSUE_ITEMS_URL,
         method: "POST",
-        json: { "item_id_info": item_id_info }
+        json: { "item_id_info": item_id_info, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200)) {
             console.error('{}: {} {}'.format(hq_url, error, body));
@@ -477,7 +477,7 @@ router.post('/start_of_day_signal', function (req, res, next) {
         url: SUPPLIES_STATUS_URL,
         method: "POST",
         forever: true,
-        json: { "supplies": supplies }
+        json: { "supplies": supplies, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200)) {
             console.error('{}: {} {}'.format(hq_url, error, body));
@@ -623,7 +623,7 @@ router.post('/automatic_sod_24hr_outlet', function (req, res, next) {
     request({
         url: OUTLET_REGISTER_URL,
         method: "POST",
-        json: { "phase": phase, "outlet_id": process.env.OUTLET_ID }
+        json: { "phase": phase, "outlet_id": process.env.OUTLET_ID, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200))
         {
@@ -647,7 +647,7 @@ router.post('/end_of_day_signal', function (req, res, next) {
     requestretry({
         url: SUPPLIES_STATUS_URL,
         method: "POST",
-        json: { "supplies": supplies }
+        json: { "supplies": supplies, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200)) {
             console.error('{}: {} {}'.format(hq_url, error, body));
@@ -700,6 +700,23 @@ router.post('/end_of_day_signal', function (req, res, next) {
                 }
                 debug("Updated HQ with the recovery details");
             });
+        });
+
+        redisClient.del("loginuserdetails", function (del_err, del_reply)
+        {
+            if (del_err)
+            {
+                console.error("error while deleting loginuserdetails in redis- {}".format(b_err));
+                return;
+            }
+        });
+        redisClient.del("loginuserid", function (del_err, del_reply)
+        {
+            if (del_err)
+            {
+                console.error("error while deleting loginuserid in redis- {}".format(b_err));
+                return;
+            }
         });
 
         // Setting the start of day flag to true
@@ -804,7 +821,7 @@ router.post('/store_last_load_info', function (req, res, next) {
     requestretry({
         url: UPDATE_RECEIVED_TIME_URL,
         method: "POST",
-        json: { "po_id": po_id, "batch_id": batch_id, "rest_id": rest_id, "reconcile_items": reconcile_items }
+        json: { "po_id": po_id, "batch_id": batch_id, "rest_id": rest_id, "reconcile_items": reconcile_items, "userid": loggedinuserid }
     }, function (error, response, body) {
         if (error || (response && response.statusCode != 200)) {
             console.error('{}: {} {}'.format(hq_url, error, body));
@@ -845,7 +862,7 @@ router.post('/mark_po_received', function (req, res, next) {
         requestretry({
             url: UPDATE_RECEIVED_TIME_URL,
             method: "POST",
-            json: { "po_id": item.po_id, "batch_id": item.batch_id, "rest_id": item.rest_id }
+            json: { "po_id": item.po_id, "batch_id": item.batch_id, "rest_id": item.rest_id, "userid": loggedinuserid }
         }, function (error, response, body) {
             if (error || (response && response.statusCode != 200)) {
                 console.error('{}: {} {}'.format(hq_url, error, body));
@@ -956,7 +973,7 @@ router.post('/update_item_issues', function (req, res, next) {
         url: hq_url + UPDATE_ITEM_ISSUES_URL + outlet_id,
         method: "POST",
         forever: true,
-        json: { "barcode_details": barcode_details, "non_food_issue": non_food_issue }
+        json: { "barcode_details": barcode_details, "non_food_issue": non_food_issue, "userid": loggedinuserid }
     },
         function (error, response, body) {
             if (error || (response && response.statusCode != 200)) {
@@ -1409,10 +1426,17 @@ router.post('/save_reconcile_data', function (req, res, next) {
         console.log("save_reconcile_data_url: " + save_reconcile_data_url);
         console.log("reconcile_items: " + JSON.stringify(reconcile_items));
 
+        console.log("loggedinuserid :" + loggedinuserid);
+        var userid = loggedinuserid;
+        if (loggedinuserid == null || loggedinuserid == 0)
+        {
+            userid = 1;
+        }
+
         request({
             url: save_reconcile_data_url,
             method: "POST",
-            json: { "reconcile_items": reconcile_items }
+            json: { "reconcile_items": reconcile_items, "userid": loggedinuserid }
         }, function (error, response) {
             if (error || (response && response.statusCode != 200))
             {
@@ -1647,7 +1671,7 @@ router.post('/update_po_master_list_received_time', function (req, res, next) {
         request({
             url: update_po_master_list_received_time_url,
             method: "POST",
-            json: { "reconcile_items": reconcile_items }
+            json: { "reconcile_items": reconcile_items, "userid": loggedinuserid }
         }, function (error, response) {
             if (error || (response && response.statusCode != 200))
             {

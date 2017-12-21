@@ -67,7 +67,7 @@
       </div>
       <table class="food_issues table table-striped table-hover ">
         <thead>
-          <tr>
+          <tr class="tableheader">
             <th>Food item name</th>
             <th>Problem</th>
             <th>Note</th>
@@ -79,7 +79,7 @@
       </table>
       <table class="non_food_issues table table-striped table-hover ">
         <thead>
-          <tr>
+          <tr class="tableheader">
             <th class="issue">Issue</th>
             <th>Problem</th>
             <th class="note">Note</th>

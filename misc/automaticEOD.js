@@ -230,6 +230,23 @@ function checkAutomaticEOD(is24hr) {
                        }
                    });
 
+                   redisClient.del("loginuserdetails", function (del_err, del_reply)
+                   {
+                       if (del_err)
+                       {
+                           console.error("error while deleting loginuserdetails in redis- {}".format(b_err));
+                           return;
+                       }
+                   });
+                   redisClient.del("loginuserid", function (del_err, del_reply)
+                   {
+                       if (del_err)
+                       {
+                           console.error("error while deleting loginuserid in redis- {}".format(b_err));
+                           return;
+                       }
+                   });
+
                    // delete_reconcile_stock_count
                    request({
                        url: outlet_url + '/outlet_app/delete_reconcile_stock_count',

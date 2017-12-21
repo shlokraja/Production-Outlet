@@ -12,6 +12,7 @@ var order_app = require('./routes/order_app');
 var plcio = require('./routes/plcio');
 var outlet_app = require('./routes/outlet_app');
 var beverage_orders = require('./routes/beverage_orders');
+var users = require('./routes/users');
 
 var app = express();
 
@@ -41,13 +42,15 @@ app.use('/order_app', order_app);
 app.use('/plcio', plcio);
 app.use('/outlet_app', outlet_app);
 app.use('/beverage_orders', beverage_orders);
-
+app.use('/users', users);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
+
+global.loggedinuserid = 0;
 
 // error handlers
 

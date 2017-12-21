@@ -50,7 +50,7 @@
         </div>
         <table class="table table-striped table-hover ">
             <thead>
-                <tr>
+                <tr class="tableheader">
                     <th>Dispense Id</th>
                     <th>Bill Nos</th>
                     <th>Status</th>

@@ -121,6 +121,19 @@ thead {
   margin-right: 4px;
 }
 
+#footer .btn{
+    padding-left:10px;
+    padding-right:10px;
+}
+
+#footer .logout{
+    float: right;
+    left: -148px!important;
+    top: 0;
+    min-width: 100px;
+    text-align: center;
+}
+
 .panel {
   background: #FFFFFF;
   border: 1px solid #CCCCCC;
@@ -718,7 +731,7 @@ thead {
 }
 
 .sales-cash-table tr th {
-    background-color: #43b02a;
+    background-color: #fbb713;
     color: #ffffff;
     font-weight: bold;
     text-align:center;
@@ -732,6 +745,18 @@ td.sidemenu {
     background-color: #EEEEEE;
     border-right: 1px solid #CCCCCC;
 font-weight:bold;
+}
+
+.tableheader { 
+    background-color: #fbb713;
+    color: #4a4b4a;
+    font-weight: bold;
+    text-align:center; 
+
+}
+
+.table > thead > tr > th {
+    vertical-align: top;
 }
 
 .slot_popup

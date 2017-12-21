@@ -128,7 +128,7 @@ function updateStockCountExpiry()
                     url: REMOVE_EXPIRED_URL,
                     method: "POST",
                     maxAttempts: 1,
-                    json: { "barcodes": barcodes }
+                    json: { "barcodes": barcodes, "userid": loggedinuserid }
                 }, function (expire_error, expire_response, expire_body)
                 {
                     debug("expire_response.statusCode", expire_response.statusCode);

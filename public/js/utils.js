@@ -494,7 +494,9 @@ function POConfirm(button, po_id, batch_id) {
     }).done(function () {
         console.log("get_data_matrix funcion call success")
         var hqUrl = HQ_URL + '/outlet/update_PO_received_time';
-        $.post(hqUrl, { po_id: po_id }, function () {
+        var loggedinuserid = simpleStorage.get("loggedinuserid");
+        $.post(hqUrl, { po_id: po_id, "userid": loggedinuserid }, function ()
+        {
 
         }).done(function (data) {
             console.log("update_PO_received_time funcion call success")

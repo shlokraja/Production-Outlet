@@ -190,15 +190,136 @@
         <button id="beverage_control" class="btn btn-default btn-raised"><span>Beverage Control</span></button>
         <button id="do_eod" class="btn btn-danger btn-raised"><span>Generate EOD</span></button>
         <button id="force_failure" class="btn btn-danger btn-raised"><span>Manual Failure</span></button>
-        <button id="load_scanned_items" class="btn btn-material-blue-200"  style="height:36px;margin-top: 15px;">
+        <button id="load_scanned_items" class="btn btn-material-blue-200" style="height:36px;margin-top: 15px;">
             <!--<img src="img/icons/Load.png" height="30">-->
             <span style="margin-left:-10px;">Load Scan Items</span>
         </button>
         <button id="load_items" class="btn btn-material-blue-200" style="height:36px;margin-top: 15px;"><span>Expiry Popup</span></button>
-	<button id="retest" class="btn btn-danger btn-raised" style="margin-top:15px;margin-left:5px;"><span>Retest</span></button>
+        <button id="retest" class="btn btn-danger btn-raised" style="margin-top:15px;margin-left:5px;"><span>Retest</span></button>
+        <div class="col-md-1 dropdown" style="float:right; margin-top:15px">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <img src="img/icons/man.png" style="margin-top:0px;margin-left:-60px;" height="30">
+                <label id="username"></label>
+            </a>
+            <div class="dropdown-menu logout" aria-labelledby="Logout">
+                <a class="dropdown-item" id="btnlogout">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!--All the dialogs start from here. -->
+    <div id="Login" class="modal fade">
+        <div class="modal-dialog">
+            <!--<form id="loginForm">-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img src="img/icons/login.png" height="30">
+                        <h4 class="modal-title">Login</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <!--table class="table table-striped table-hover ">
+                            <tbody>
+                                <tr>
+                                    <td><label for="user_name">User Name</label></td>
+                                    <td><input type="text" data-validation="[NOTEMPTY]" required minlength="3" id="user_name" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="password">Password</label></td>
+                                    <td><input minlength="4" data-validation="[NOTEMPTY]" required type="password" id="password" /></td>
+                                </tr>
+                            </tbody>
+                        </table>-->
+                        <div class="container">
+                            <form>
+                                <div class="form-group row">
+                                    <label for="user_name" id="user_name_label" class="col-sm-2 col-form-label">User Name</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control is-valid" id="user_name" placeholder="user Name">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <small hidden id="user_name_Help" class="text-danger">
+                                            Must be 8-20 characters long.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="password" id="password_label" class="col-sm-2 col-form-label">Password</label>
+                                    <div class="col-sm-2">
+                                        <input type="password" class="form-control is-invalid" id="password" placeholder="Password">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <small hidden id="password_Help" class="text-danger">
+                                            Must be 8-20 characters long.
+                                        </small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input id="btnLogin" type="submit" value="Login" class="btn btn-raised btn-default" />
+                    </div>
+                </div>
+            <!--</form>-->
+        </div>
     </div>
 
-    <!--All the dialogs start from here. -->
+    <div id="sales-details-dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:1200px;height:600px; left: -290px; overflow:scroll">
+                <div class="modal-header">
+                    <h4>Sales Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="sales_details_content">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr class="tableheader">
+                                    <th>PO id</th>
+                                    <th>Restaurant Name</th>
+                                    <th>Session</th>
+                                    <th style="width:125px">Food Name</th>
+                                    <th>Scanned</th>
+                                    <th>Unscanned</th>
+                                    <th>Damaged</th>
+                                    <th>Expiry</th>
+                                    <th>Restaurant Fault</th>
+                                    <th>Undelivered</th>
+                                    <th>Taken</th>
+                                    <th>Sold</th>
+                                    <th>Cash</th>
+                                    <th>Card</th>
+                                    <th>Sodexo Card</th>
+                                    <th>Codexo Coupon</th>
+                                    <th>Credit</th>
+                                    <th>Gprs Card</th>
+                                    <th>Wallet</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Sales_details_table"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="Remarks">
+                        <label>
+                            Remarks :
+                            <textarea id="remarks" rows="3" cols="125"></textarea>
+                        </label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default btn-raised btn-primary" data-dismiss="panel" id="sales_details_yes">Yes</button>
+                    <button class="btn btn-default btn-raised btn-primary" data-dismiss="panel" id="sales_details_no">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="expiry-items-dialog" class="modal fade" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -673,6 +794,7 @@
     </div>
 
     <script src="js/jquery.js"></script>
+    <script src="js/jquery.toaster.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/ripples.min.js"></script>
     <script src="js/material.min.js"></script>
@@ -707,7 +829,7 @@
         // converting the string eod time into minutes elapsed
         eod_time = '{{eod_time}}';
         eod_time = parseInt(eod_time.split(':')[0])*60 + parseInt(eod_time.split(':')[1]);
-        is24hr = {{is24hr}};
+        is24hr = '{{is24hr}}';
         supply_list = [];
         staff_roster = {};
         roles = '{{roles}}';
@@ -729,7 +851,6 @@
             // Initializing the data bindings
             initDataBindings();
             getIssueEnum();
-           
             if (simpleStorage.get("test_mode") == true) {
                 $("#test_mode-dialog").modal({show:true, backdrop:"static"});
             }
@@ -743,6 +864,11 @@
             }
             setInterval(run, 3000);
         });
+
+        $('.dropdown').on('show.bs.dropdown', function () {
+            var length = (parseInt($('.dropdown-menu').css('width'), 10) * -1)+15;
+            $('.dropdown-menu').css('left', length);
+        })
     </script>
 </body>
 </html>
