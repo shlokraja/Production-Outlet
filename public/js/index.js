@@ -1268,7 +1268,7 @@ function ConvertToBoolean(val)
 
 function checkStartOfDay() {
     // check if outlet is not 24hr and start of day flag is enabled
-    is24hr = false;
+   // is24hr = false;
     if (!ConvertToBoolean(is24hr) && start_of_day)
 {
         var tableDiv = $("#sod-dialog .modal-body table tbody");
