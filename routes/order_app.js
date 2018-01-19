@@ -194,6 +194,16 @@ console.log(queue_list);
                     var outlet_config = JSON.parse(reply);
                     callback(null, outlet_config.phone_no);
                   });
+                },
+                expiry_time: function (callback) {
+                  redisClient.get(helper.expiry_time_node, function (err, reply) {
+                    if (err) {
+                      callback('error while retreiving from redis- {}'.format(err), null);
+                      return;
+                    }
+                    var expiryTime = JSON.parse(reply);
+                    callback(null, expiryTime);
+                  });
                 }
               },
                 function (err, results) {
@@ -218,7 +228,8 @@ console.log(queue_list);
                       stock_count = updateStockCount(stock_count, barcode);
                       var heating_flag = order_details[item_id]["heating_flag"];
                       var heating_reduction = order_details[item_id]["heating_reduction"];//SHLOK
-                      
+
+                   
                       var plc_type = 1;
                       var num_lanes_count = 1;
                       if (results.num_lanes != null) {
@@ -242,10 +253,10 @@ console.log(queue_list);
                       if (test_mode && item_id >= 9000 && item_id <= 9100) {
                         if (item_id % 2 == 0) {
                           heating_flag = false;
-                          heating_reduction = false;//SHLOK
+                          heating_reduction = 0;//SHLOK
                         } else {
                           heating_flag = true;
-                          heating_reduction = true;//SHLOK
+                          heating_reduction = 1;//SHLOK
                         }
                       }
                       var order_stub = createOrderStub(barcode, counter_code,
@@ -376,7 +387,6 @@ console.log(queue_list);
                                   userid = 1;
                               }
                               console.log("*****************UserID*************" + userid);
-
                     var obj = {
                       "name": "ORDER_DETAILS",
                       "order_details": order_details,
@@ -673,6 +683,14 @@ router.post('/fulfill_replacement/:id', function (req, res, next) {
         //callback(null, plc_config.lane_count);
         callback(null, plc_config);
       });
+    },
+    expiry:function(callback){
+      redisClient.hgetall(helper.expiry_time_node,
+        function (err, expiry_time) {
+          if (err) {
+            console.log("error");
+            return;
+          }
     }
   },
     function (err, results) {
@@ -1214,18 +1232,47 @@ router.post('/customer_details/:mobile_num', function (req, res, next) {
 function getOldestBarcode(item_id, item_details) {
   var oldestTimestamp = 9999999900; // This is the max timestamp possible
   var barcode = null;
-  for (var i = 0; i < item_details.length; i++) {
-    // This item has expired, no need to see this item
-    // if (item_details[i]["expired"] || item_details[i]["spoiled"])
-    if (item_details[i]["spoiled"]) {
-      continue;
-    }
-    if (item_details[i]["timestamp"] < oldestTimestamp) {
-      oldestTimestamp = item_details[i]["timestamp"];
-      barcode = item_details[i]["barcode"];
-    }
-  }
-  return barcode;
+  var current_time = Math.floor(Date.now() / 1000);
+  redisClient.hget(helper.expiry_time_node, item_id,
+    function (err, expiry_time) {
+      console.log("fired");
+//console.log("expiry---------------------",item_details[i]["timestamp"] + expiry_time_secs + 3000);
+
+      if (err) {
+        console.log("error");
+        return;
+      }
+      if (!expiry_time) {
+	expiry_time = '6h';
+        console.log("no expiry time-----------------",expiry_time);
+      }
+      var expiry_time_secs = parseFloat(expiry_time.slice(0, expiry_time.length - 1)) * 60 * 60;
+	console.log('expiry_time------------witout setting---------------',expiry_time_secs);
+      for (var i = 0; i < item_details.length; i++) {
+        // This item has expired, no need to see this item
+        // if (item_details[i]["expired"] || item_details[i]["spoiled"])
+        if (item_details[i]["spoiled"]) {
+          continue;
+        }
+        if (item_details[i]["expired"]) {
+          if ((item_details[i]["timestamp"] + expiry_time_secs + 300) <= current_time) {
+            console.log("expiry_time + 3000");
+		//console.log("barcode after 5 mins of expiry----------------",barcode);
+            continue;
+          }
+        }
+        if (item_details[i]["timestamp"] < oldestTimestamp) {
+          oldestTimestamp = item_details[i]["timestamp"];
+          barcode = item_details[i]["barcode"];
+console.log("barcode before 5 mins of expiry----------------",barcode);
+        }
+      }
+console.log("Expiry_________---------",barcode);
+      return barcode;
+
+    });
+
+
 }
 
 function updateStockCount(stock_count, barcode) {
@@ -1259,16 +1306,17 @@ function createOrderStub(barcode, lane_no,
   heating_flag, date,
   bill_no, dispense_id, heating_reduction, isveg, plc_type) { // SHLOK
   debug("createOrderStub:: Heating: " + heating_flag + "; Reduction:" + heating_reduction + "; Veg:" + isveg);
-  var heating;
+  var heating = heating_reduction;
   var veg = '1';
 
   if (!heating_flag) {
     heating = '0';
-  } else if (heating_reduction) {
-    heating = '1';
-  } else {
-    heating = '2';
-  }
+  } 
+//else if (heating_reduction) {
+  //  heating = '1';
+ // } else {
+   // heating = '2';
+ // }
 
   if (!isveg) // non-Veg
   {

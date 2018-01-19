@@ -286,6 +286,7 @@ router.post('/Logout', function (req, res, next)
                         });
                     }
                 }
+				loggedinuserid = 0;
                 res.status(200).send(body);
             });
     });

@@ -560,6 +560,16 @@ router.post('/start_of_day_signal', function (req, res, next) {
         }
         debug("Set the dispense_id to 1");
     });
+    /* delete done queue*/
+    redisClient.del(helper.pending_done_node, function (del_err, del_reply)
+    {
+        if (del_err)
+        {
+            console.error("error while deleting pending_done_node in redis- {}".format(b_err));
+            return;
+        }
+    });
+
 
     redisClient.set(helper.start_of_day_flag, false, function (sod_err, sod_reply) {
         if (sod_err) {
@@ -718,6 +728,17 @@ router.post('/end_of_day_signal', function (req, res, next) {
                 return;
             }
         });
+
+        redisClient.del(helper.pending_done_node, function (del_err, del_reply)
+        {
+            if (del_err)
+            {
+                console.error("error while deleting pending_done_node in redis- {}".format(b_err));
+                return;
+            }
+        });
+
+        
 
         // Setting the start of day flag to true
         redisClient.set(helper.start_of_day_flag, true, function (sod_err, sod_reply) {

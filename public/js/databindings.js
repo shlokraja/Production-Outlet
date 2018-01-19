@@ -344,6 +344,7 @@ function initDataBindings()
 //Login
 $('#btnLogin').click(function ()
 {
+    $('#overlay').show();
     var username = $('#user_name').val();
     var password = $('#password').val();
 
@@ -352,6 +353,7 @@ $('#btnLogin').click(function ()
         $('#user_name_label').addClass('text-danger');
         $('#user_name_Help').text('User Name should not be Empty or greater than 3 characters');
         $('#user_name_Help').show();
+        $('#overlay').hide();
         return;
     }
     if (password == "" || password == null || password.length <= 3)
@@ -359,6 +361,7 @@ $('#btnLogin').click(function ()
         $('#password_label').addClass('text-danger');
         $('#password_Help').text('Password should not be Empty or greater than 3 characters');
         $('#password_Help').show();
+        $('#overlay').hide();
         return;
     }
     var obj = new Object();
@@ -374,11 +377,13 @@ $('#btnLogin').click(function ()
         success: function (data)
         {
             $("#Login").modal("hide");
+            $('#overlay').hide();
             $.toaster({ priority: 'success', message: data });
             initDataBindings();
         },
         error: function (jqxhr, textStatus, error)
         {
+            $('#overlay').hide();
             var err_msg = textStatus + ", " + jqxhr.responseText;
             console.error("Check Login Failed" + err_msg);
             $.toaster({ priority: 'danger', message: err_msg.toString() });
@@ -388,6 +393,7 @@ $('#btnLogin').click(function ()
 
 $('#sales_details_yes').click(function ()
 {
+    $('#overlay').show();
     var remarks = $("#remarks").val();
     var desiredremarks = remarks.replace(/[^\w\s]/gi, '');
     var username = $("#username").text();
@@ -400,12 +406,22 @@ $('#sales_details_yes').click(function ()
         success: function (data)
         {
             $("#sales-details-dialog").modal("hide");
-            $.toaster({ priority: 'success', message: data });
-            initDataBindings();
+            var isfromlogout = $('#btnlogout').data('logout');
+            if (isfromlogout)
+            {
+                window.location.reload(true);
+            }
+            else
+            {
+                showEODDialog();
+            }
+            $('#btnlogout').data('logout', true);
             $("#remarks").val('');
+            $('#overlay').hide();
         },
         error: function (jqxhr, textStatus, error)
         {
+            $('#overlay').hide();
             var err_msg = textStatus + ", " + jqxhr.responseText;
             console.error("Check Login Failed" + err_msg);
             $.toaster({ priority: 'danger', message: err_msg.toString() });
@@ -415,5 +431,6 @@ $('#sales_details_yes').click(function ()
 
 $('#sales_details_no').click(function ()
 {
+    $('#btnlogout').data('logout', true);
     $("#sales-details-dialog").modal("hide");
 });

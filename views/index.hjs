@@ -37,6 +37,25 @@
     animation: pulsate 1s ease-out;
     animation-iteration-count: infinite;
 }
+   #overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #000;
+    opacity: 0.9;
+    z-index:99999999;
+}
+   #loading {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -15px 0 0 -15px;
+}
+
 
 .unscanned-msg, .unscanned-msg-title{    
     font-size: 14px;
@@ -65,6 +84,7 @@
 </head>
 <body>
     <!--<div id="idtest"> test content</div>-->
+    <div id="overlay"><img id="loading" src="img/icons/spinnerlarge.gif"></div>
     <div id="main_content">
 
         <div class="signal"></div>
@@ -202,7 +222,7 @@
                 <label id="username"></label>
             </a>
             <div class="dropdown-menu logout" aria-labelledby="Logout">
-                <a class="dropdown-item" id="btnlogout">
+                <a class="dropdown-item" id="btnlogout" data-logout="true" >
                     <span>Logout</span>
                 </a>
             </div>
@@ -218,19 +238,6 @@
                         <h4 class="modal-title">Login</h4>
                     </div>
                     <div class="modal-body">
-
-                        <!--table class="table table-striped table-hover ">
-                            <tbody>
-                                <tr>
-                                    <td><label for="user_name">User Name</label></td>
-                                    <td><input type="text" data-validation="[NOTEMPTY]" required minlength="3" id="user_name" /></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password</label></td>
-                                    <td><input minlength="4" data-validation="[NOTEMPTY]" required type="password" id="password" /></td>
-                                </tr>
-                            </tbody>
-                        </table>-->
                         <div class="container">
                             <form>
                                 <div class="form-group row">
@@ -275,29 +282,30 @@
                 </div>
                 <div class="modal-body">
                     <div id="sales_details_content">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" style="table-layout:fixed;font-size:small">
                             <thead>
                                 <tr class="tableheader">
-                                    <th>PO id</th>
-                                    <th>Restaurant Name</th>
-                                    <th>Session</th>
-                                    <th style="width:125px">Food Name</th>
-                                    <th>Scanned</th>
-                                    <th>Unscanned</th>
-                                    <th>Damaged</th>
-                                    <th>Expiry</th>
-                                    <th>Restaurant Fault</th>
-                                    <th>Undelivered</th>
-                                    <th>Taken</th>
-                                    <th>Sold</th>
-                                    <th>Cash</th>
-                                    <th>Card</th>
-                                    <th>Sodexo Card</th>
-                                    <th>Codexo Coupon</th>
-                                    <th>Credit</th>
-                                    <th>Gprs Card</th>
-                                    <th>Wallet</th>
-                                    <th>Total</th>
+                                    <th style="width:60px">PO id</th>
+                                    <th style="width:50px">Res Name</th>
+                                    <th style="width:70px">Session</th>
+                                    <th style="width:70px">Food Item Id</th>
+                                    <th style="width:200px">Food Name</th>
+                                    <th style="width:70px">Scanned</th>
+                                    <th style="width:70px">Unscanned</th>
+                                    <th style="width:70px">Damaged</th>
+                                    <th style="width:50px">Expiry</th>
+                                    <th style="width:50px">Res Fault</th>
+                                    <th style="width:100px">Undelivered</th>
+                                    <th style="width:50px">Taken</th>
+                                    <th style="width:40px">Sold</th>
+                                    <th style="width:50px">Cash</th>
+                                    <th style="width:50px">Card</th>
+                                    <th style="width:50px">Sodexo Card</th>
+                                    <th style="width:50px">Sodexo Coupon</th>
+                                    <th style="width:50px">Credit</th>
+                                    <th style="width:50px">Gprs Card</th>
+                                    <th style="width:50px">Wallet</th>
+                                    <th style="width:50px">Total</th>
                                 </tr>
                             </thead>
                             <tbody id="Sales_details_table"></tbody>
@@ -845,7 +853,8 @@
     <script src="js/message_center.js"></script>
     <script>
         $(document).ready(function() {
-            $('.signal').hide()
+            $('.signal').hide();
+$('#overlay').hide();
             // Initializing material design
             $.material.init();
             // Initializing the data bindings

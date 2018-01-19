@@ -23,6 +23,7 @@ var food_item_data = {};
 
 $("#btnlogout").click(function ()
 {
+    $('#overlay').show();
     $.ajax({
         type: 'get',
         url: OUTLET_URL + '/users/checkLogout',
@@ -37,9 +38,12 @@ $("#btnlogout").click(function ()
             {
                 $.toaster({ priority: 'danger', message: "Please Complete Reconcile to logout" });
             }
+console.log("overlay hide called");
+            $('#overlay').hide();
         },
         error: function (jqxhr, textStatus, error)
         {
+            $('#overlay').hide();
             var err_msg = textStatus + ", " + jqxhr.responseText;
             console.error("Check Logout Failed" + err_msg);
         },
@@ -55,6 +59,7 @@ var OpenSales_Details_Modal = function ()
         url: OUTLET_URL + '/users/getSalesDetails',
         success: function (data)
         {
+console.log("/users/getSalesDetails Sucess");
             data = JSON.parse(data);
             data = JSON.parse(data.sales_details);
             if (data != null)
@@ -88,6 +93,7 @@ var OpenSales_Details_Modal = function ()
                     sales_html += "<td style='text-align:center;'>" +salesdata.po_id + "</td>";
                     sales_html += "<td style='text-align:center;'>" + salesdata.restaurantname + "</td>";
                     sales_html += "<td style='text-align:center;'>" + salesdata.session + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.item_id + "</td>";
                     sales_html += "<td style='text-align:left; width:200px'>" + salesdata.name + "</td>";
                     sales_html += "<td style='text-align:right;'>" + salesdata.scanned + "</td>";
                     sales_html += "<td style='text-align:right;'>" + salesdata.unscanned + "</td>";
@@ -151,6 +157,7 @@ var OpenSales_Details_Modal = function ()
                 sales_html += "</tr>";
 
                 $("#Sales_details_table").html(sales_html);
+console.log("before showing modal");
                 $("#sales-details-dialog").modal({ show: true, backdrop: "static" });
             }
         },
@@ -486,7 +493,7 @@ $("#loading_issue_confirm").click(function () {
             $("#loading_issue_confirm").prop("disabled", false);
             $("#loading-issue-dialog").modal("hide");
             if (from_eod)
-{
+            {
                 from_eod = false;
                 location.reload(true);
             }
@@ -1090,28 +1097,32 @@ $("#do_eod").click(function () {
             console.log("check_reconcile_data_url: " + JSON.parse(data));
             var result = JSON.parse(data);
             if (result.json_result.result_reconcile_data.length == 0)
-{
+            {
                 // in the success callback, call getStaffRoster()
                 if (confirm("This will expire all stock! Do you want to proceed?"))
-{
+                {
                     $.ajax({
                         type: 'POST',
                         url: OUTLET_URL + '/outlet_app/delete_reconcile_stock_count',
-                        success: function (data) {
+                        success: function (data)
+                        {
                         }
                         ,
-                        error: function (jqxhr, textStatus, error) {
+                        error: function (jqxhr, textStatus, error)
+                        {
                             var err_msg = textStatus + ", " + jqxhr.responseText;
                             console.error("check_reconcile_data failed: " + err_msg);
                         },
                         contentType: "application/json",
                         dataType: 'text'
                     });
-                    showEODDialog();
+                    //showEODDialog();
+                    $('#btnlogout').data('logout', false);
+                    $('#btnlogout').trigger('click');
                 }
             }
             else
-{
+            {
                 alert("Can't produce EOD until to be complete reconcile for all PO's. So, please reconcile for all PO's");
             }
         },
@@ -1268,7 +1279,7 @@ function ConvertToBoolean(val)
 
 function checkStartOfDay() {
     // check if outlet is not 24hr and start of day flag is enabled
-   // is24hr = false;
+    is24hr = false;
     if (!ConvertToBoolean(is24hr) && start_of_day)
 {
         var tableDiv = $("#sod-dialog .modal-body table tbody");

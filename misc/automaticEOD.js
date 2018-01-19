@@ -119,6 +119,25 @@ function checkAutomaticEOD(is24hr) {
                    }
                });
                }
+               else
+               {
+		console.log('loggedinuserid  ' + loggedinuserid);
+                redisClient.del("loginuserid", function (del_err, del_reply)
+                {
+                     if (del_err)
+                     {
+                         console.error("error while deleting loginuserid in redis- {}".format(del_err));
+                         return;
+                     }
+		    console.log('loggedinuserid  ' + del_reply);
+		    if(del_reply!=undefined || del_reply!=null){
+			if(del_reply!= 0) { 
+                   		eod_user_session_logout(del_reply);
+			}
+		    }
+                });
+		
+               }
 
                // EOD status entry in outlet_register table
                // outlet_app.outlet_register("eod", true);
@@ -230,23 +249,6 @@ function checkAutomaticEOD(is24hr) {
                        }
                    });
 
-                   redisClient.del("loginuserdetails", function (del_err, del_reply)
-                   {
-                       if (del_err)
-                       {
-                           console.error("error while deleting loginuserdetails in redis- {}".format(b_err));
-                           return;
-                       }
-                   });
-                   redisClient.del("loginuserid", function (del_err, del_reply)
-                   {
-                       if (del_err)
-                       {
-                           console.error("error while deleting loginuserid in redis- {}".format(b_err));
-                           return;
-                       }
-                   });
-
                    // delete_reconcile_stock_count
                    request({
                        url: outlet_url + '/outlet_app/delete_reconcile_stock_count',
@@ -264,5 +266,200 @@ function checkAutomaticEOD(is24hr) {
                });
            }
        });
+}
+
+function eod_user_session_logout(user_id)
+{
+    var hq_url = process.env.HQ_URL;
+    var outlet_id = process.env.OUTLET_ID;
+    var login_Url = "/users/salesdetails/";
+console.log("****************************" + hq_url + login_Url + loggedinuserid + '/' + outlet_id);
+    requestretry({
+        url: hq_url + login_Url + user_id + '/' + outlet_id,
+        method: "GET",
+        forever: true,
+    },
+        function (error, response, body)
+        {
+            if (error || (response && response.statusCode != 200))
+            {
+                console.error('{}: {} {}'.format(hq_url, error, body));
+                return;
+            }
+            data = JSON.parse(body);
+            if (data != null)
+            {
+		console.log("****************************" + hq_url + login_Url + user_id + '/' + outlet_id);
+
+                var sales_html = "";
+                var cashTotal = 0;
+                var cardTotal = 0;
+                var sodexocardTotal = 0;
+                var sodexocouponTotal = 0;
+                var creditTotal = 0;
+                var gprscardTotal = 0;
+                var walletTotal = 0;
+                var Total = 0;
+
+                var ScannedCount = 0;
+                var UnscannedCount = 0;
+                var DamagedCount = 0;
+                var ExpiryCount = 0;
+                var UndeliveredCount = 0;
+                var RestaurantFaultCount = 0;
+
+                var Totaltaken = 0;
+                var TotalSold = 0;
+
+
+                sales_html += "<table class='table table-striped table-hover' style='table-layout:fixed;font-size:small'>";
+                sales_html += "<thead>";
+                sales_html += "<tr class='tableheader'>";
+                sales_html += "<th style='width:60px'>PO id</th>";
+                sales_html += "<th style='width:50px'>Res Name</th>";
+                sales_html += "<th style='width:70px'>Session</th>";
+                sales_html += "<th style='width:70px'>Food Item Id</th>";
+                sales_html += "<th style='width:200p'>Food Name</th>";
+                sales_html += "<th style='width:70px'>Scanned</th>";
+                sales_html += "<th style='width:70px'>Unscanned</th>";
+                sales_html += "<th style='width:70px'>Damaged</th>";
+                sales_html += "<th style='width:50px'>Expiry</th>";
+                sales_html += "<th style='width:50px'>Res Fault</th>";
+                sales_html += "<th style='width:100p'>Undelivered</th>";
+                sales_html += "<th style='width:50px'>Taken</th>";
+                sales_html += "<th style='width:40px'>Sold</th>";
+                sales_html += "<th style='width:50px'>Cash</th>";
+                sales_html += "<th style='width:50px'>Card</th>";
+                sales_html += "<th style='width:50px'>Sodexo Card</th>   ";
+                sales_html += "<th style='width:50px'>Sodexo Coupon</th> ";
+                sales_html += "<th style='width:50px'>Credit</th>";
+                sales_html += "<th style='width:50px'>Gprs Card</th>";
+                sales_html += "<th style='width:50px'>Wallet</th>";
+                sales_html += "<th style='width:50px'>Total</th>";
+                sales_html += "</tr>";
+                sales_html += "</thead>";
+                sales_html += "<tbody id='Sales_details_table'>";
+                for (var i = 0; i < data.length; i++)
+                {
+                    var item_Total = 0;
+                    var salesdata = data[i];
+                    sales_html += "<tr>";
+
+                    sales_html += "<td style='text-align:center;'>" + salesdata.po_id + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.restaurantname + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.session + "</td>";
+                    sales_html += "<td style='text-align:center;'>" + salesdata.item_id + "</td>";
+                    sales_html += "<td style='text-align:left; width:200px'>" + salesdata.name + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.scanned + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.unscanned + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.damaged + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.expiry + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.restaurantfault + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.undelivered + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.taken + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sold + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.cash + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.card + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sodexocard + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.sodexocoupon + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.credit + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.gprscard + "</td>";
+                    sales_html += "<td style='text-align:right;'>" + salesdata.wallet + "</td>";
+                    item_Total = salesdata.cash + salesdata.card + salesdata.sodexocard + salesdata.sodexocoupon + salesdata.credit + salesdata.gprscard + salesdata.wallet;
+                    sales_html += "<td style='text-align:right;'>" + item_Total + "</td>";
+                    sales_html += "</tr>";
+                    cashTotal += salesdata.cash;
+                    cardTotal += salesdata.card;
+                    sodexocardTotal += salesdata.sodexocard;
+                    sodexocouponTotal += salesdata.sodexocoupon;
+                    creditTotal += salesdata.credit;
+                    gprscardTotal += salesdata.gprscard;
+                    walletTotal += salesdata.wallet;
+                    Total += item_Total;
+                    Totaltaken += Number(salesdata.taken);
+                    TotalSold += Number(salesdata.sold);
+
+                    ScannedCount += Number(salesdata.scanned);
+                    UnscannedCount += Number(salesdata.unscanned);
+                    DamagedCount += Number(salesdata.damaged);
+                    ExpiryCount += Number(salesdata.expiry);
+                    RestaurantFaultCount += Number(salesdata.restaurantfault);
+                    UndeliveredCount += Number(salesdata.undelivered);
+
+                }
+
+                sales_html += "<tr style='font-weight: bolder;'>";
+                sales_html += "<td>Total: </td>";
+                sales_html += "<td></td>";
+                sales_html += "<td></td>";
+                sales_html += "<td></td>";
+                sales_html += "<td style='text-align:right;'>" + ScannedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + UnscannedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + DamagedCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + ExpiryCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + RestaurantFaultCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + UndeliveredCount + "</td>";
+                sales_html += "<td style='text-align:right;'>" + Totaltaken + "</td>";
+                sales_html += "<td style='text-align:right;'>" + TotalSold + "</td>";
+                sales_html += "<td style='text-align:right;'>" + cashTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + cardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + sodexocardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + sodexocouponTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + creditTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + gprscardTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + walletTotal + "</td>";
+                sales_html += "<td style='text-align:right;'>" + Total + "</td>";
+                sales_html += "</tr>";
+                sales_html += "</tbody>";
+                sales_html += "</table>";
+
+                var remarks = "User Not logged Out.Triggering Auto logout";
+                var username = "";
+                redisClient.get("loginuserdetails",
+                function (set_err, set_reply)
+                {
+                    if (set_err)
+                    {
+                        console.error('error while inserting in redis- {}'.format(set_err));
+                        return;
+                    }
+                    set_reply = JSON.parse(set_reply);
+                    username = set_reply.username;
+
+
+
+               request({
+                   url: outlet_url + '/users/Logout',
+		   json:{ "remarks": "User Not logged Out.Triggering Auto logout", "mailcontent": sales_html, "username": username },
+                   method: "POST"
+               },
+                  function (error, response_expire_all_items, body) {
+                      if (error || (response_expire_all_items && response_expire_all_items.statusCode != 200))
+                      {
+                          console.error("System Logout Failed" + error);
+                          return;
+                      }
+
+                            redisClient.del("loginuserdetails", function (del_err, del_reply)
+                            {
+                                if (del_err)
+                                {
+                                    console.error("error while deleting loginuserdetails in redis- {}".format(del_err));
+                                    return;
+                                }
+                            });
+                            redisClient.del("loginuserid", function (del_err, del_reply)
+                            {
+                                if (del_err)
+                                {
+                                    console.error("error while deleting loginuserid in redis- {}".format(del_err));
+                                    return;
+                                }
+                            });
+                  });
+
+                });
+            }
+        });
 }
 
