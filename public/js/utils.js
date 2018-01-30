@@ -340,12 +340,7 @@ function getItemDetails() {
             console.log('Received price data');
             for (var i = 0; i < data.length; i++)
             {
-                var heat_reduction=data[i]["heating_reduction"];
                 
-                if (data[i]["heating_mode"])
-                {
-                    heat_reduction=data[i]["heating_mode"];
-                }
                 price_data[data[i]["id"]] = {
                     "mrp": data[i]["mrp"],
                     "name": data[i]["name"],
@@ -377,7 +372,7 @@ function getItemDetails() {
                         }
                     },
                     "heating_reqd": data[i]["heating_required"],
-                    "heating_reduction":heat_reduction,// SHLOK                                        
+                    "heating_reduction": data[i]["heating_reduction"],// SHLOK
                     "stock_quantity": -1
                 }
             }

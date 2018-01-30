@@ -83,6 +83,61 @@ function AutomaticEOD() {
             }
         }
     });
+    redisClient.get(helper.outlet_session_node, function (err, reply) {
+        if (err)
+        {
+            console.log('error while retreiving from redis- {}'.format(err), null);
+            return;
+        }
+        var outlet_session=JSON.parse(reply);
+        console.log("Session Details got from  HQ");
+        console.log(outlet_session.array_agg);
+        var curDateTime = new Date();
+    var curDateInterval = new Date ( curDateTime ); // 08:10
+curDateInterval.setMinutes (curDateTime.getMinutes() - 10 );  //08:00  
+console.log("Current date and time :"+curDateTime);
+console.log("Current date and Interval :"+curDateInterval);
+        for (var endTime in outlet_session.array_agg)
+        {
+            var endTimes=outlet_session.array_agg[endTime];
+            var dtCompare= new Date (new Date().toDateString() + ' ' + endTimes);
+            console.log("End time of Sessions:"+dtCompare);
+            //console.log("curDateTime>= dtCompare:");
+            //console.log(curDateTime>= dtCompare);
+            //console.log("dtCompare>=curDateInterval:");
+            //console.log(dtCompare<=curDateInterval);
+                if ( curDateInterval<=dtCompare && dtCompare<=curDateTime )
+                {
+                        console.log("Triggering Auto Expiry for Session");            
+                        // expire_all_items
+               request({
+                   url: outlet_url + '/outlet_app/expire_all_items',
+                   method: "POST"
+               },
+                  function (error, response_expire_all_items, body) {
+                      if (error || (response_expire_all_items && response_expire_all_items.statusCode != 200))
+                      {
+                          console.error('{}: {} {}'.format(hq_url, error, ""));
+                          return;
+                      }
+                      console.log("expire_all_items done");
+                                        // signal_expiry_item_removal
+                                request({
+                                    url: outlet_url + '/outlet_app/signal_expiry_item_removal',
+                                    method: "POST"
+                                },
+                                    function (error, response_expire_all_items, body) {
+                                        if (error || (response_expire_all_items && response_expire_all_items.statusCode != 200))
+                                        {
+                                            console.error('{}: {} {}'.format(hq_url, error, ""));
+                                            return;
+                                        }
+                                        console.log("signal_expiry_item_removal done");
+                                });
+                  });
+                }
+        }
+    });
 }
 
 function checkAutomaticEOD(is24hr) {

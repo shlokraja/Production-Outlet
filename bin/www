@@ -23,6 +23,7 @@ var update_stock_count_expiry = require('../misc/updateStockCountExpiry');
 var store_plc_config = require('../misc/storePLCConfig');
 var store_live_stock = require('../misc/storeLiveStock');
 var store_outlet_config = require('../misc/storeOutletConfig');
+var storeOutletSessions =require('../misc/storeOutletSessions');
 var check_incoming_po = require('../misc/checkIncomingPOStatus');
 var populate_loading_issue_items = require('../misc/populateLoadingIssueItems');
 var store_recovery_details = require('../misc/storeRecoveryDetails');
@@ -55,6 +56,7 @@ app.set('port', port);
 var server = http.createServer(app);
 server.timeout = 0;
 io = require('socket.io')(server);
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 // This call returns the stock count to the order app
 io.on('connection', function (socket) {
@@ -114,6 +116,7 @@ store_recovery_details();
 store_dispenser_queue();
 store_plc_config();
 store_outlet_config();
+storeOutletSessions();
 populate_loading_issue_items();
 store_item_ids();
 store_reconcile_remarks();
@@ -130,6 +133,8 @@ setInterval(BillProcess.InitBillPush,(60000*30));
 // Keeping the config refresh interval to be every hour
 setInterval(store_plc_config, 3600000);
 setInterval(store_outlet_config, 3600000);
+// Auto expiry  changes
+setInterval(storeOutletSessions, 3600000);
 
 // Keeping the po_details refresh interval to be every 10 mins
 setInterval(store_reconcile_remarks,600000);
@@ -138,7 +143,7 @@ setInterval(store_session_timings,600000);
 setInterval(automaticReconcile.InitAutomaticReconcile, 60000);
 setInterval(automaticReconcileEOD.InitEODAutomaticReconcile, 30 * 60000);
 setInterval(sendPendingReconcileMail.InitPendingReconcileMail, 30 * 60000);
-setInterval(automaticEOD.InitAutomaticEOD, 30 * 60000);
+setInterval(automaticEOD.InitAutomaticEOD, 5 * 60000);
 
 /**
  * Normalize a port into a number, string, or false.

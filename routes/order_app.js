@@ -253,10 +253,10 @@ console.log(queue_list);
                       if (test_mode && item_id >= 9000 && item_id <= 9100) {
                         if (item_id % 2 == 0) {
                           heating_flag = false;
-                          heating_reduction = 0;//SHLOK
+                          heating_reduction = false;//SHLOK
                         } else {
                           heating_flag = true;
-                          heating_reduction = 1;//SHLOK
+                          heating_reduction = true;//SHLOK
                         }
                       }
                       var order_stub = createOrderStub(barcode, counter_code,
@@ -1306,17 +1306,16 @@ function createOrderStub(barcode, lane_no,
   heating_flag, date,
   bill_no, dispense_id, heating_reduction, isveg, plc_type) { // SHLOK
   debug("createOrderStub:: Heating: " + heating_flag + "; Reduction:" + heating_reduction + "; Veg:" + isveg);
-  var heating = heating_reduction;
+  var heating;
   var veg = '1';
 
   if (!heating_flag) {
     heating = '0';
+  } else if (heating_reduction) {
+    heating = '1';
+  } else {
+    heating = '2';
   } 
-//else if (heating_reduction) {
-  //  heating = '1';
- // } else {
-   // heating = '2';
- // }
 
   if (!isveg) // non-Veg
   {
